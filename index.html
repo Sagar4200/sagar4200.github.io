@@ -37,7 +37,7 @@
         <section id="auth-section" class="hidden max-w-md mx-auto bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl text-center space-y-6">
             <div>
                 <h3 class="text-lg font-bold text-slate-200">Join the Community</h3>
-                <p class="text-xs text-slate-400 mt-1">Sign in securely with your Google account to interact with vlogs.</p>
+                <p class="text-xs text-slate-400 mt-1">Sign in securely with your Google account to write and manage vlogs.</p>
             </div>
             <div id="error-msg" class="text-red-400 text-xs hidden"></div>
             <button onclick="handleGoogleLogin()" class="w-full flex items-center justify-center gap-3 bg-white hover:bg-slate-100 text-slate-900 font-semibold py-3 rounded-xl text-sm transition-all shadow-lg cursor-pointer">
@@ -51,31 +51,28 @@
             </button>
         </section>
 
-        <!-- Vlog Feed Grid -->
-        <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <!-- Vlog Card 1 -->
-            <article class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-lg hover:border-slate-700 transition-all">
-                <div class="h-48 bg-gradient-to-tr from-cyan-900/40 to-indigo-900/40 flex items-center justify-center text-cyan-300 font-bold text-lg">
-                    🎥 B.Tech CSE Lab Vlog
+        <!-- Vlog Upload Section (Only for Logged-in Users) -->
+        <section id="upload-section" class="hidden bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
+            <h3 class="text-lg font-bold text-cyan-400">✍️ Publish a New Vlog</h3>
+            <form id="vlog-form" onsubmit="handleVlogSubmit(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs text-slate-400 mb-1">Vlog Title</label>
+                    <input type="text" id="vlog-title" required placeholder="Enter vlog title..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-500">
                 </div>
-                <div class="p-6 space-y-3">
-                    <span class="text-xs px-3 py-1 bg-cyan-950 text-cyan-400 rounded-full font-medium">College Life</span>
-                    <h3 class="text-xl font-bold text-white">Coding Sessions & Late Night Debugging</h3>
-                    <p class="text-slate-400 text-sm">How we survive data structures, algorithms, and project deadlines at college hostel rooms.</p>
+                <div>
+                    <label class="block text-xs text-slate-400 mb-1">Vlog Content / Description</label>
+                    <textarea id="vlog-desc" rows="3" required placeholder="Write your thoughts..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-500"></textarea>
                 </div>
-            </article>
+                <button type="submit" class="bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-semibold px-6 py-2.5 rounded-xl text-xs transition-all cursor-pointer">Publish Vlog</button>
+            </form>
+        </section>
 
-            <!-- Vlog Card 2 -->
-            <article class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-lg hover:border-slate-700 transition-all">
-                <div class="h-48 bg-gradient-to-tr from-purple-900/40 to-pink-900/40 flex items-center justify-center text-pink-300 font-bold text-lg">
-                    🎶 Bansuri & Music Notes
-                </div>
-                <div class="p-6 space-y-3">
-                    <span class="text-xs px-3 py-1 bg-purple-950 text-pink-400 rounded-full font-medium">Hobbies</span>
-                    <h3 class="text-xl font-bold text-white">Finding Peace with Hindustani Classical Flute</h3>
-                    <p class="text-slate-400 text-sm">A quick glimpse into my daily bansuri practice sessions after long hours of full-stack web dev.</p>
-                </div>
-            </article>
+        <!-- Vlog Feed Grid -->
+        <section class="space-y-6">
+            <h3 class="text-xl font-bold text-white border-b border-slate-800 pb-3">Recent Vlogs</h3>
+            <div id="vlog-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Vlogs will be injected here dynamically -->
+            </div>
         </section>
 
     </main>
@@ -91,27 +88,40 @@
         const SUPABASE_ANON_KEY = 'TOR_SUPABASE_PUBLISHABLE_KEY_EKHANE_BOSABI'; // Tor key ekhane bosabi
 
         const { createClient } = supabase;
-        const _supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const _supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+            auth: {
+                flowType: 'implicit',
+                persistSession: true,
+                autoRefreshToken: true,
+                detectSessionInUrl: true
+            }
+        });
 
         const loadingEl = document.getElementById('loading');
         const authSection = document.getElementById('auth-section');
+        const uploadSection = document.getElementById('upload-section');
         const navAuth = document.getElementById('nav-auth');
         const errorMsgEl = document.getElementById('error-msg');
+        const vlogGrid = document.getElementById('vlog-grid');
+
+        let currentUser = null;
+
+        // Local storage base vlogs list so user can see uploaded vlogs instantly
+        let vlogs = JSON.parse(localStorage.getItem('sagar_vlogs')) || [
+            { title: 'Coding Sessions & Late Night Debugging', desc: 'How we survive data structures, algorithms, and project deadlines at college hostel rooms.', author: 'Sagar Biswas' },
+            { title: 'Finding Peace with Hindustani Classical Flute', desc: 'A quick glimpse into my daily bansuri practice sessions after long hours of full-stack web dev.', author: 'Sagar Biswas' }
+        ];
 
         async function initApp() {
-            // Handle hash tokens automatically returned by Supabase OAuth
-            if (window.location.hash && window.location.hash.includes('access_token')) {
-                const { data, error } = await _supabase.auth.getSession();
-                if (data.session) {
-                    window.location.hash = ''; // Clear hash from URL
-                }
-            }
-
             const { data: { session } } = await _supabase.auth.getSession();
+            currentUser = session ? session.user : null;
             updateUI(session);
+            renderVlogs();
 
             _supabase.auth.onAuthStateChange((event, session) => {
+                currentUser = session ? session.user : null;
                 updateUI(session);
+                renderVlogs();
             });
         }
 
@@ -119,18 +129,62 @@
             loadingEl.classList.add('hidden');
             if (session) {
                 authSection.classList.add('hidden');
+                uploadSection.classList.remove('hidden');
                 navAuth.innerHTML = `
                     <div class="flex items-center gap-3">
-                        <span class="text-xs text-cyan-300 hidden md:inline">${session.user.email}</span>
+                        <span class="text-xs text-cyan-300 hidden md:inline font-medium">${session.user.email}</span>
                         <button onclick="handleLogout()" class="bg-red-600/20 hover:bg-red-600/30 text-red-400 border border-red-900/50 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer">Logout</button>
                     </div>
                 `;
             } else {
                 authSection.classList.remove('hidden');
+                uploadSection.classList.add('hidden');
                 navAuth.innerHTML = `
                     <button onclick="document.getElementById('auth-section').scrollIntoView({behavior: 'smooth'})" class="bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-semibold px-4 py-2 rounded-xl text-xs transition-all cursor-pointer">Sign In</button>
                 `;
             }
+        }
+
+        function renderVlogs() {
+            vlogGrid.innerHTML = '';
+            vlogs.forEach((vlog, index) => {
+                const isMyVlog = currentUser && currentUser.email === vlog.author;
+                const card = document.createElement('article');
+                card.className = `bg-slate-900 border ${isMyVlog ? 'border-cyan-500/50' : 'border-slate-800'} rounded-2xl overflow-hidden shadow-lg hover:border-slate-700 transition-all p-6 space-y-3`;
+                card.innerHTML = `
+                    <div class="flex justify-between items-start">
+                        <span class="text-xs px-3 py-1 bg-cyan-950 text-cyan-400 rounded-full font-medium">${isMyVlog ? '✨ My Vlog' : 'Community Vlog'}</span>
+                        <span class="text-[10px] text-slate-500">By: ${vlog.author}</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-white">${vlog.title}</h3>
+                    <p class="text-slate-400 text-sm">${vlog.desc}</p>
+                `;
+                vlogGrid.appendChild(card);
+            });
+        }
+
+        function handleVlogSubmit(e) {
+            e.preventDefault();
+            if (!currentUser) {
+                alert('Please login first to upload a vlog!');
+                return;
+            }
+
+            const title = document.getElementById('vlog-title').value;
+            const desc = document.getElementById('vlog-desc').value;
+
+            const newVlog = {
+                title: title,
+                desc: desc,
+                author: currentUser.email
+            };
+
+            vlogs.unshift(newVlog);
+            localStorage.setItem('sagar_vlogs', JSON.stringify(vlogs));
+
+            document.getElementById('vlog-form').reset();
+            renderVlogs();
+            alert('Vlog published successfully!');
         }
 
         async function handleGoogleLogin() {
