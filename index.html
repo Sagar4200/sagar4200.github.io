@@ -84,15 +84,18 @@
 
     <!-- Script Logic -->
     <script>
+        // ==========================================
+        // ⚠️ IMPORTANT: এখানে তোর আসল Supabase Anon Key বসাতে হবে
+        // ==========================================
         const SUPABASE_URL = 'https://kzbhpwtcsowzivgpellr.supabase.co';
-        const SUPABASE_ANON_KEY = 'TOR_SUPABASE_PUBLISHABLE_KEY_EKHANE_BOSABI'; // তোর সঠিক Supabase Anon Key এখানে বসাবি
+        const SUPABASE_ANON_KEY = 'তোর_আসল_SUPABASE_ANON_KEY_এখানে_বসা'; // ⚠️ এটা চেঞ্জ কর
 
         const { createClient } = supabase;
         const _supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
             auth: {
                 persistSession: true,
                 autoRefreshToken: true,
-                detectSessionInUrl: true
+                detectSessionInUrl: true // Supabase নিজেই URL থেকে টোকেন ধরবে
             }
         });
 
@@ -111,27 +114,17 @@
         ];
 
         async function initApp() {
-            // URL hash থেকে টোকেন হ্যান্ডেল করা
-            if (window.location.hash && window.location.hash.includes('access_token')) {
-                const hashParams = new URLSearchParams(window.location.hash.substring(1));
-                const accessToken = hashParams.get('access_token');
-                const refreshToken = hashParams.get('refresh_token');
-                
-                if (accessToken) {
-                    await _supabase.auth.setSession({
-                        access_token: accessToken,
-                        refresh_token: refreshToken
-                    });
-                    window.location.hash = '';
-                }
-            }
+            // ১. প্রথমে সেশন চেক কর
+            const { data: { session }, error } = await _supabase.auth.getSession();
+            if (error) console.error("Session Error:", error);
 
-            const { data: { session } } = await _supabase.auth.getSession();
             currentUser = session ? session.user : null;
             updateUI(session);
             renderVlogs();
 
+            // ২. Auth State Change লিসেনার (লগইন/লগআউট হলে অটো আপডেট হবে)
             _supabase.auth.onAuthStateChange((event, session) => {
+                console.log("Auth Event:", event); // ডিবাগ করার জন্য কনসোল এ দেখতে পারিস
                 currentUser = session ? session.user : null;
                 updateUI(session);
                 renderVlogs();
@@ -141,6 +134,7 @@
         function updateUI(session) {
             loadingEl.classList.add('hidden');
             if (session) {
+                // Logged In
                 authSection.classList.add('hidden');
                 uploadSection.classList.remove('hidden');
                 navAuth.innerHTML = `
@@ -150,6 +144,7 @@
                     </div>
                 `;
             } else {
+                // Logged Out
                 authSection.classList.remove('hidden');
                 uploadSection.classList.add('hidden');
                 navAuth.innerHTML = `
@@ -205,6 +200,8 @@
             const { error } = await _supabase.auth.signInWithOAuth({
                 provider: 'google',
                 options: {
+                    // redirectTo: window.location.origin + window.location.pathname
+                    // গিটহাব পেজের জন্য নিচের লাইনটা ব্যবহার করা ভালো
                     redirectTo: window.location.origin + window.location.pathname
                 }
             });
