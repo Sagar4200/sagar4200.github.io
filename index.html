@@ -85,12 +85,11 @@
     <!-- Script Logic -->
     <script>
         const SUPABASE_URL = 'https://kzbhpwtcsowzivgpellr.supabase.co';
-        const SUPABASE_ANON_KEY = 'TOR_SUPABASE_PUBLISHABLE_KEY_EKHANE_BOSABI'; // Tor key ekhane bosabi
+        const SUPABASE_ANON_KEY = 'TOR_SUPABASE_PUBLISHABLE_KEY_EKHANE_BOSABI'; // তোর সঠিক Supabase Anon Key এখানে বসাবি
 
         const { createClient } = supabase;
         const _supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
             auth: {
-                flowType: 'implicit',
                 persistSession: true,
                 autoRefreshToken: true,
                 detectSessionInUrl: true
@@ -106,13 +105,27 @@
 
         let currentUser = null;
 
-        // Local storage base vlogs list so user can see uploaded vlogs instantly
         let vlogs = JSON.parse(localStorage.getItem('sagar_vlogs')) || [
             { title: 'Coding Sessions & Late Night Debugging', desc: 'How we survive data structures, algorithms, and project deadlines at college hostel rooms.', author: 'Sagar Biswas' },
             { title: 'Finding Peace with Hindustani Classical Flute', desc: 'A quick glimpse into my daily bansuri practice sessions after long hours of full-stack web dev.', author: 'Sagar Biswas' }
         ];
 
         async function initApp() {
+            // URL hash থেকে টোকেন হ্যান্ডেল করা
+            if (window.location.hash && window.location.hash.includes('access_token')) {
+                const hashParams = new URLSearchParams(window.location.hash.substring(1));
+                const accessToken = hashParams.get('access_token');
+                const refreshToken = hashParams.get('refresh_token');
+                
+                if (accessToken) {
+                    await _supabase.auth.setSession({
+                        access_token: accessToken,
+                        refresh_token: refreshToken
+                    });
+                    window.location.hash = '';
+                }
+            }
+
             const { data: { session } } = await _supabase.auth.getSession();
             currentUser = session ? session.user : null;
             updateUI(session);
@@ -147,7 +160,7 @@
 
         function renderVlogs() {
             vlogGrid.innerHTML = '';
-            vlogs.forEach((vlog, index) => {
+            vlogs.forEach((vlog) => {
                 const isMyVlog = currentUser && currentUser.email === vlog.author;
                 const card = document.createElement('article');
                 card.className = `bg-slate-900 border ${isMyVlog ? 'border-cyan-500/50' : 'border-slate-800'} rounded-2xl overflow-hidden shadow-lg hover:border-slate-700 transition-all p-6 space-y-3`;
@@ -200,6 +213,7 @@
 
         async function handleLogout() {
             await _supabase.auth.signOut();
+            window.location.href = window.location.origin + window.location.pathname;
         }
 
         function showError(msg) {
