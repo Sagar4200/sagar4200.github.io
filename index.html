@@ -32,7 +32,7 @@
             <div id="error-msg" class="text-red-400 text-xs hidden"></div>
             
             <!-- Google Sign-In Button -->
-            <button onclick="handleGoogleLogin()" class="w-full flex items-center justify-center gap-3 bg-white hover:bg-slate-100 text-slate-900 font-semibold py-3 rounded-xl text-sm transition-all shadow-lg">
+            <button onclick="handleGoogleLogin()" class="w-full flex items-center justify-center gap-3 bg-white hover:bg-slate-100 text-slate-900 font-semibold py-3 rounded-xl text-sm transition-all shadow-lg cursor-pointer">
                 <svg class="w-5 h-5" viewBox="0 0 24 24">
                     <path fill="#4285F4" d="M23.745 12.27c-.07-.8-.64-1.54-1.44-1.77H12v4.51h6.61c-.29 1.54-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.65-5.17 3.65-8.82z"/>
                     <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.11-6.72-4.95H1.2v3.15C3.18 21.31 7.24 24 12 24z"/>
@@ -51,10 +51,10 @@
             </div>
             
             <div class="p-4 bg-emerald-950/20 border border-emerald-900/40 rounded-xl text-emerald-400 text-xs">
-                ✅ Session is active. You will stay logged in on localhost or across devices seamlessly via Supabase!
+                ✅ Session is active. You are successfully logged in via Supabase cloud auth!
             </div>
 
-            <button onclick="handleLogout()" class="w-full bg-red-600/20 hover:bg-red-600/30 text-red-400 border border-red-900/50 font-semibold py-2.5 rounded-xl text-sm transition-all">
+            <button onclick="handleLogout()" class="w-full bg-red-600/20 hover:bg-red-600/30 text-red-400 border border-red-900/50 font-semibold py-2.5 rounded-xl text-sm transition-all cursor-pointer">
                 Logout
             </button>
         </div>
@@ -75,7 +75,7 @@
         const userEmailEl = document.getElementById('user-email');
         const errorMsgEl = document.getElementById('error-msg');
 
-        // Check active session on load (Persistent local session)
+        // Check active session on load
         async function checkSession() {
             const { data: { session } } = await _supabase.auth.getSession();
             manageView(session);
@@ -101,10 +101,7 @@
         async function handleGoogleLogin() {
             clearError();
             const { data, error } = await _supabase.auth.signInWithOAuth({
-                provider: 'google',
-                options: {
-                    redirectTo: window.location.origin
-                }
+                provider: 'google'
             });
             if (error) {
                 showError(error.message);
