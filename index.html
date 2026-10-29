@@ -32,6 +32,7 @@
     .card-hover:hover { transform: translateY(-3px); box-shadow: 0 20px 40px -15px rgba(0,0,0,.15); }
     .line-clamp-2 { display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
     #assistant-btn { touch-action: none; }
+    .whitespace-pre-line { white-space: pre-line; }
   </style>
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen">
@@ -178,13 +179,34 @@
         <!-- ADMIN VIEW -->
         <section id="view-admin" class="view hidden animate-fade-in">
           <h2 class="text-2xl font-bold text-red-600 mb-6">Admin Control Panel</h2>
+
+          <!-- AI AUTO-PUBLISHER -->
           <div class="glass rounded-2xl p-5 mb-6 border-l-4 border-brand-500">
-            <h3 class="font-bold text-sm mb-2">🤖 AI Auto-Updater</h3>
-            <textarea id="ai-raw-input" rows="3" class="w-full p-3 rounded-xl border border-slate-200 text-sm mb-3" placeholder="Paste scheme/job text here..."></textarea>
-            <button id="btn-ai-parse" class="px-4 py-2 bg-brand-600 text-white rounded-xl text-sm font-semibold">Parse & Save</button>
-            <div id="ai-preview" class="hidden mt-4 p-4 rounded-xl bg-slate-100 text-xs"></div>
+            <div class="flex items-center gap-2 mb-1">
+              <h3 class="font-bold text-base">🤖 AI Auto-Publisher</h3>
+              <span class="text-[10px] font-bold uppercase bg-brand-100 text-brand-700 px-2 py-0.5 rounded">Gemini</span>
+            </div>
+            <p class="text-xs text-slate-500 mb-4">Paste any scheme/scholarship/job website link. The AI will automatically extract all details (eligibility, % criteria, how to apply, documents, deadline, apply link) and let you publish it in one click.</p>
+
+            <div class="flex flex-col sm:flex-row gap-2 mb-3">
+              <input id="ai-url-input" type="url" placeholder="https://svmcm.wb.gov.in/apply" class="flex-1 p-3 rounded-xl border border-slate-200 text-sm" />
+              <button id="btn-ai-fetch" class="px-5 py-2.5 bg-gradient-to-r from-brand-600 to-saffron-500 text-white rounded-xl text-sm font-semibold whitespace-nowrap shadow-sm hover:opacity-90 transition">🔍 Fetch & Analyze</button>
+            </div>
+
+            <details class="mb-2">
+              <summary class="text-xs text-slate-500 cursor-pointer hover:text-brand-600">📄 Or paste raw text manually</summary>
+              <textarea id="ai-raw-input" rows="4" class="w-full mt-2 p-3 rounded-xl border border-slate-200 text-sm" placeholder="Paste scheme/job page text here..."></textarea>
+              <button id="btn-ai-parse" class="mt-2 px-4 py-2 bg-slate-700 text-white rounded-xl text-sm font-semibold hover:bg-slate-800 transition">🤖 Analyze Text</button>
+            </details>
+
+            <div id="ai-preview" class="hidden mt-4"></div>
           </div>
-          <div id="admin-list" class="space-y-3"></div>
+
+          <!-- EXISTING ENTRIES -->
+          <div class="glass rounded-2xl p-5">
+            <h3 class="font-bold text-sm mb-3">📚 Existing Entries in Database</h3>
+            <div id="admin-list" class="space-y-2"></div>
+          </div>
         </section>
 
       </main>
@@ -210,15 +232,18 @@
   <!-- ================= APP LOGIC ================= -->
   <script type="module">
     // ============================================================
-    // 1. CONFIGURATION 
+    // 1. CONFIGURATION
     // ============================================================
     const SUPABASE_URL = 'https://kzbhpwtcsowzivgpellr.supabase.co';
-    
-    // ✅ আপনার দেওয়া Supabase Publishable Key এখানে যুক্ত করা হয়েছে
-    const SUPABASE_ANON_KEY = 'sb_publishable_RUO7ScIOI8q5r8_iH5udVA_WmbrdwLf'; 
+    const SUPABASE_ANON_KEY = 'sb_publishable_RUO7ScIOI8q5r8_iH5udVA_WmbrdwLf';
 
-    // ⚠️ Admin Login এর জন্য এখানে আপনার জিমেইলটি বসান
-    const ADMIN_EMAILS = ['sb197207@gmail.com']; 
+    // ⚠️ Admin Login emails
+    const ADMIN_EMAILS = ['sb197207@gmail.com'];
+
+    // 🤖 Gemini API key (replace with AIza... key from https://aistudio.google.com/apikey if this fails)
+    const GEMINI_API_KEY = 'AQ.Ab8RN6Irr5nUFAvf1WAWK8nsNZgJRBHL78UwyhJ1l-AP5sAnrQ';
+    // Models tried in order — first working one wins
+    const GEMINI_MODELS = ['gemini-2.0-flash', 'gemini-2.5-flash', 'gemini-1.5-flash'];
 
     import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
@@ -241,10 +266,10 @@
       el.className = `${colors[type]} text-white text-sm px-4 py-3 rounded-xl shadow-lg mb-2 animate-slide-up`;
       el.textContent = msg;
       $('#toast-container').appendChild(el);
-      setTimeout(() => el.remove(), 4000);
+      setTimeout(() => el.remove(), 4500);
     }
 
-    const escapeHtml = (str) => { if(!str) return ''; const div = document.createElement('div'); div.textContent = str; return div.innerHTML; };
+    const escapeHtml = (str) => { if(str==null) return ''; const div = document.createElement('div'); div.textContent = String(str); return div.innerHTML; };
 
     // ============================================================
     // 3. AUTH & PROFILE
@@ -268,15 +293,13 @@
       state.user = null; state.profile = null;
       toast('Signed out.', 'success');
       renderAll();
+      router();
     }
 
     async function loadProfile() {
       if (!state.user) return;
       const { data, error } = await supabase.from('profiles').select('*').eq('id', state.user.id).maybeSingle();
-      if (error) {
-        console.error('Profile load error:', error);
-        return;
-      }
+      if (error) { console.error('Profile load error:', error); return; }
       state.profile = data;
     }
 
@@ -295,11 +318,7 @@
         updated_at: new Date().toISOString()
       };
       const { error } = await supabase.from('profiles').upsert(payload, { onConflict: 'id' });
-      if (error) {
-        console.error(error);
-        toast('Failed to save profile: ' + error.message, 'error');
-        return;
-      }
+      if (error) { console.error(error); toast('Failed to save profile: ' + error.message, 'error'); return; }
       await loadProfile();
       toast('Profile saved successfully!', 'success');
       renderAll();
@@ -309,23 +328,13 @@
     // 4. DATA FETCHING
     // ============================================================
     async function loadData() {
-      // Schemes
       const { data: sch, error: e1 } = await supabase.from('schemes').select('*');
-      if (e1) { 
-        console.error('Schemes fetch error:', e1); 
-        toast('Could not load schemes. Did you create the "schemes" table?', 'error'); 
-      } else {
-        state.schemes = sch || [];
-      }
+      if (e1) { console.error('Schemes fetch error:', e1); toast('Could not load schemes. Did you create the "schemes" table?', 'error'); }
+      else state.schemes = sch || [];
 
-      // Jobs
       const { data: jb, error: e2 } = await supabase.from('jobs').select('*');
-      if (e2) { 
-        console.error('Jobs fetch error:', e2); 
-        toast('Could not load jobs. Did you create the "jobs" table?', 'error'); 
-      } else {
-        state.jobs = jb || [];
-      }
+      if (e2) { console.error('Jobs fetch error:', e2); toast('Could not load jobs. Did you create the "jobs" table?', 'error'); }
+      else state.jobs = jb || [];
     }
 
     // ============================================================
@@ -361,6 +370,17 @@
 
       if (signedIn) {
         $('#sidebar-name').textContent = state.profile?.full_name || state.user.email;
+        const av = state.profile?.avatar_url || '';
+        $('#sidebar-avatar').src = av;
+        $('#profile-avatar-preview').src = av;
+        // Fill form values
+        const f = $('#profile-form');
+        if (f && state.profile) {
+          ['full_name','date_of_birth','gender','caste','state','district','class10_percentage','class12_percentage'].forEach(k => {
+            const el = f.querySelector(`[name="${k}"]`);
+            if (el && state.profile[k] != null) el.value = state.profile[k];
+          });
+        }
       }
     }
 
@@ -368,7 +388,7 @@
       return `
         <article class="bg-white p-5 rounded-2xl border border-slate-100 card-hover">
           <h3 class="font-bold text-slate-900 line-clamp-2">${escapeHtml(s.title)}</h3>
-          <p class="text-xs text-slate-500 mt-2 line-clamp-2">${escapeHtml(s.description || '')}</p>
+          <p class="text-xs text-slate-500 mt-2 line-clamp-2 whitespace-pre-line">${escapeHtml(s.description || '')}</p>
           <div class="mt-4 flex gap-2">
              ${s.apply_link ? `<a href="${escapeHtml(s.apply_link)}" target="_blank" class="px-3 py-1.5 bg-brand-600 text-white text-xs rounded-lg">Apply</a>` : ''}
           </div>
@@ -380,6 +400,7 @@
         <article class="bg-white p-5 rounded-2xl border border-slate-100 card-hover">
           <h3 class="font-bold text-slate-900 line-clamp-2">${escapeHtml(j.title)}</h3>
           <p class="text-xs text-slate-500 mt-1">${escapeHtml(j.organization || '')}</p>
+          ${j.description ? `<p class="text-xs text-slate-400 mt-2 line-clamp-2 whitespace-pre-line">${escapeHtml(j.description)}</p>` : ''}
           <div class="mt-4">
             <button onclick="window.alert('Details page under construction.')" class="px-3 py-1.5 bg-indigo-600 text-white text-xs rounded-lg">View Details</button>
           </div>
@@ -388,7 +409,7 @@
 
     function renderAll() {
       renderAuthUI();
-      
+
       const schList = state.schemes.filter(s => s.type === 'scholarship' && matchesProfile(s, state.profile));
       const scList = state.schemes.filter(s => s.type === 'scheme' && matchesProfile(s, state.profile));
       const jbList = state.jobs.filter(j => matchesProfile(j, state.profile));
@@ -409,27 +430,298 @@
     function renderAdminList() {
       const el = $('#admin-list');
       if(!el) return;
-      const all = [...state.schemes, ...state.jobs];
+      const all = [...state.schemes.map(x=>({...x,_t:'scheme'})), ...state.jobs.map(x=>({...x,_t:'job'}))];
       if(all.length === 0) {
         el.innerHTML = '<p class="text-sm text-slate-400 text-center py-4">No entries found in Database.</p>';
         return;
       }
       el.innerHTML = all.map(i => `
-        <div class="bg-white p-3 rounded-xl border border-slate-100 flex justify-between items-center">
-          <span class="text-sm font-semibold">${escapeHtml(i.title)}</span>
-          <button onclick="window.alert('Delete feature requires Supabase DELETE policy.')" class="text-xs text-red-500">Delete</button>
+        <div class="bg-white p-3 rounded-xl border border-slate-100 flex justify-between items-center gap-2">
+          <div class="min-w-0 flex-1">
+            <span class="text-[10px] font-bold uppercase text-brand-600">${i._t}</span>
+            <p class="text-sm font-semibold text-slate-800 truncate">${escapeHtml(i.title)}</p>
+          </div>
+          <button data-del-table="${i._t}" data-del-id="${i.id}" class="text-xs text-red-500 hover:underline">Delete</button>
         </div>
       `).join('');
+      el.querySelectorAll('[data-del-id]').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const table = btn.dataset.delTable === 'job' ? 'jobs' : 'schemes';
+          const id = btn.dataset.delId;
+          if (!confirm('Delete this entry?')) return;
+          showLoader(true);
+          const { error } = await supabase.from(table).delete().eq('id', id);
+          showLoader(false);
+          if (error) toast('Delete failed: ' + error.message, 'error');
+          else { toast('Deleted.', 'success'); await loadData(); renderAll(); }
+        });
+      });
     }
 
     // ============================================================
-    // 8. ROUTER & EVENTS
+    // 8. GEMINI AI ENGINE
+    // ============================================================
+    const CORS_PROXIES = [
+      (u) => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
+      (u) => `https://corsproxy.io/?url=${encodeURIComponent(u)}`,
+      (u) => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(u)}`,
+    ];
+
+    async function fetchPageContent(url) {
+      let lastErr;
+      for (const p of CORS_PROXIES) {
+        try {
+          const res = await fetch(p(url), { signal: AbortSignal.timeout(18000) });
+          if (!res.ok) { lastErr = new Error(`HTTP ${res.status}`); continue; }
+          const txt = await res.text();
+          if (txt && txt.length > 200) return txt;
+        } catch (e) { lastErr = e; console.warn('Proxy failed:', p(url).slice(0,60), e.message); }
+      }
+      throw new Error('Could not fetch URL. CORS proxy may be down — try pasting the page text manually. (' + (lastErr?.message || '') + ')');
+    }
+
+    function htmlToText(html) {
+      return html
+        .replace(/<script[\s\S]*?<\/script>/gi, ' ')
+        .replace(/<style[\s\S]*?<\/style>/gi, ' ')
+        .replace(/<noscript[\s\S]*?<\/noscript>/gi, ' ')
+        .replace(/<svg[\s\S]*?<\/svg>/gi, ' ')
+        .replace(/<[^>]+>/g, ' ')
+        .replace(/&nbsp;/g, ' ')
+        .replace(/&amp;/g, '&')
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+        .replace(/&quot;/g, '"')
+        .replace(/&#39;/g, "'")
+        .replace(/\s+/g, ' ')
+        .trim()
+        .slice(0, 28000);
+    }
+
+    const EXTRACT_SCHEMA = {
+      type: 'object',
+      properties: {
+        title: { type: 'string', description: 'Official name of the scholarship/scheme/job' },
+        type: { type: 'string', enum: ['scholarship', 'scheme', 'job'] },
+        organization: { type: 'string', description: 'Issuing department/organization/company' },
+        description: { type: 'string', description: '2-4 sentence summary of the opportunity' },
+        benefits: { type: 'string', description: 'Amount/perks/what applicant receives' },
+        eligibility_summary: { type: 'string', description: 'Full eligibility criteria in one clear paragraph' },
+        min_percentage: { type: 'number', description: 'Minimum marks % required (0 if none)' },
+        min_age: { type: 'number' },
+        max_age: { type: 'number' },
+        income_limit: { type: 'number', description: 'Max annual family income in INR (0 if none)' },
+        education_required: { type: 'string' },
+        eligible_states: { type: 'array', items: { type: 'string' }, description: 'States, or ["All"] for all-India' },
+        eligible_castes: { type: 'array', items: { type: 'string' }, description: 'SC/ST/OBC-A/OBC-B/EWS/General, or ["All"]' },
+        eligible_gender: { type: 'string', description: 'Male/Female/Other/All' },
+        how_to_apply: { type: 'array', items: { type: 'string' }, description: 'Step-by-step application process' },
+        documents_required: { type: 'array', items: { type: 'string' } },
+        deadline: { type: 'string', description: 'Last date (YYYY-MM-DD preferred) or empty' },
+        apply_link: { type: 'string', description: 'Direct application URL, or source URL' },
+      },
+      required: ['title', 'type', 'description'],
+    };
+
+    function buildPrompt(url, content) {
+      return `You are an expert at extracting structured information about Indian government schemes, scholarships, and government jobs from web pages.
+
+Analyze the following webpage content thoroughly and extract ALL relevant details. Be precise.
+
+SOURCE URL: ${url}
+
+PAGE CONTENT:
+${content}
+
+STRICT INSTRUCTIONS:
+1. Determine type: "scholarship" (scholarships/fellowships/stipends), "scheme" (welfare/state/central government schemes), or "job" (government job recruitment).
+2. Eligibility is CRITICAL. Extract EXACT criteria: minimum percentage/marks (e.g. "60% in HS"), age limits, income limits, education level, caste (SC/ST/OBC-A/OBC-B/EWS/General), gender, and states.
+3. "how_to_apply" must be step-by-step, e.g. ["Visit svmcm.wb.gov.in", "Register with Aadhaar", "Upload marksheet & income certificate", "Submit before deadline"].
+4. "documents_required" — list all documents (Aadhaar, income certificate, marksheet, bank passbook, etc.).
+5. "deadline" — convert to YYYY-MM-DD if you can identify a clear date.
+6. "apply_link" — the DIRECT application URL if present, otherwise source URL.
+7. Use these defaults when info is missing:
+   - eligible_states: ["All"], eligible_castes: ["All"], eligible_gender: "All"
+   - min_percentage/min_age/max_age/income_limit: 0
+   - how_to_apply/documents_required: []
+   - deadline: ""
+8. Never fabricate — only report what's in the page. If unsure, use the defaults.`;
+    }
+
+    async function callGemini(prompt) {
+      let lastErr = null;
+      for (const model of GEMINI_MODELS) {
+        try {
+          const res = await fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`,
+            {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                contents: [{ parts: [{ text: prompt }] }],
+                generationConfig: {
+                  responseMimeType: 'application/json',
+                  responseSchema: EXTRACT_SCHEMA,
+                  temperature: 0.15,
+                  maxOutputTokens: 2048,
+                },
+              }),
+            }
+          );
+          if (!res.ok) {
+            const t = await res.text();
+            lastErr = new Error(`[${model}] ${t.slice(0, 200)}`);
+            console.warn('Gemini model failed:', model, res.status);
+            continue;
+          }
+          const data = await res.json();
+          let text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+          if (!text) { lastErr = new Error(`[${model}] empty response`); continue; }
+          text = text.replace(/^```json\s*/i, '').replace(/```\s*$/i, '').trim();
+          return JSON.parse(text);
+        } catch (e) {
+          lastErr = e;
+          console.warn('Gemini attempt error:', model, e.message);
+        }
+      }
+      throw new Error('AI analysis failed: ' + (lastErr?.message || 'unknown'));
+    }
+
+    function renderAIPreview(info, sourceUrl) {
+      const prev = $('#ai-preview');
+      prev.classList.remove('hidden');
+
+      const chips = (arr) => (arr || []).map(x => `<span class="inline-block bg-brand-100 text-brand-700 text-xs px-2 py-0.5 rounded-md mr-1 mb-1">${escapeHtml(x)}</span>`).join('') || '<span class="text-slate-400 text-xs">—</span>';
+      const typeColor = info.type === 'job' ? 'bg-indigo-100 text-indigo-700' : info.type === 'scholarship' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700';
+
+      prev.innerHTML = `
+        <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
+          <div class="flex items-center gap-2 mb-2 flex-wrap">
+            <span class="text-xs font-bold uppercase ${typeColor} px-2 py-0.5 rounded">${escapeHtml(info.type)}</span>
+            ${info.deadline ? `<span class="text-xs text-amber-700 bg-amber-50 px-2 py-0.5 rounded">⏰ ${escapeHtml(info.deadline)}</span>` : ''}
+            ${sourceUrl ? `<a href="${escapeHtml(sourceUrl)}" target="_blank" class="text-[10px] text-brand-600 underline ml-auto truncate max-w-[200px]">source</a>` : ''}
+          </div>
+          <h4 class="font-bold text-lg text-slate-900">${escapeHtml(info.title)}</h4>
+          ${info.organization ? `<p class="text-sm text-slate-500">${escapeHtml(info.organization)}</p>` : ''}
+          <p class="text-sm text-slate-600 mt-2">${escapeHtml(info.description)}</p>
+
+          <div class="grid sm:grid-cols-2 gap-3 mt-4 text-xs">
+            <div><span class="font-semibold text-slate-700">States:</span><div class="mt-1">${chips(info.eligible_states)}</div></div>
+            <div><span class="font-semibold text-slate-700">Castes:</span><div class="mt-1">${chips(info.eligible_castes)}</div></div>
+            <div><span class="font-semibold text-slate-700">Gender:</span> ${escapeHtml(info.eligible_gender || 'All')}</div>
+            <div><span class="font-semibold text-slate-700">Min %:</span> ${info.min_percentage || 'N/A'}</div>
+            <div><span class="font-semibold text-slate-700">Age:</span> ${info.min_age || 0} – ${info.max_age || '∞'}</div>
+            <div><span class="font-semibold text-slate-700">Income limit:</span> ${info.income_limit ? '₹' + info.income_limit : 'N/A'}</div>
+            <div class="sm:col-span-2"><span class="font-semibold text-slate-700">Education:</span> ${escapeHtml(info.education_required || 'N/A')}</div>
+          </div>
+
+          ${info.benefits ? `<div class="mt-3 text-sm"><span class="font-semibold text-slate-700">💰 Benefits:</span> ${escapeHtml(info.benefits)}</div>` : ''}
+          ${info.eligibility_summary ? `<div class="mt-2 text-sm"><span class="font-semibold text-slate-700">📋 Eligibility:</span> ${escapeHtml(info.eligibility_summary)}</div>` : ''}
+
+          ${info.how_to_apply?.length ? `
+            <div class="mt-3">
+              <p class="font-semibold text-slate-700 text-sm mb-1">📝 How to Apply:</p>
+              <ol class="text-sm text-slate-600 list-decimal list-inside space-y-0.5">
+                ${info.how_to_apply.map(s => `<li>${escapeHtml(s)}</li>`).join('')}
+              </ol>
+            </div>` : ''}
+
+          ${info.documents_required?.length ? `
+            <div class="mt-3">
+              <p class="font-semibold text-slate-700 text-sm mb-1">📎 Documents:</p>
+              <ul class="text-sm text-slate-600 list-disc list-inside">${info.documents_required.map(d => `<li>${escapeHtml(d)}</li>`).join('')}</ul>
+            </div>` : ''}
+
+          <div class="mt-4 flex gap-2">
+            <button id="btn-ai-save" class="px-4 py-2 bg-emerald-600 text-white rounded-xl text-sm font-semibold hover:bg-emerald-700 transition">✅ Save to Database</button>
+            <button id="btn-ai-discard" class="px-4 py-2 bg-slate-200 text-slate-700 rounded-xl text-sm font-semibold hover:bg-slate-300 transition">Discard</button>
+          </div>
+        </div>
+      `;
+
+      $('#btn-ai-save').onclick = () => saveAIData(info, sourceUrl);
+      $('#btn-ai-discard').onclick = () => { prev.classList.add('hidden'); };
+    }
+
+    function buildRichDescription(info) {
+      const parts = [info.description || ''];
+      if (info.benefits) parts.push(`💰 Benefits: ${info.benefits}`);
+      if (info.eligibility_summary) parts.push(`📋 Eligibility: ${info.eligibility_summary}`);
+      if (info.education_required) parts.push(`🎓 Education Required: ${info.education_required}`);
+      if (info.min_percentage) parts.push(`📊 Minimum Marks: ${info.min_percentage}%`);
+      if (info.min_age || info.max_age) parts.push(`🎂 Age Limit: ${info.min_age || 0} – ${info.max_age || '∞'} years`);
+      if (info.income_limit) parts.push(`💵 Income Limit: ₹${info.income_limit}/year`);
+      if (info.eligible_gender && info.eligible_gender !== 'All') parts.push(`⚧ Gender: ${info.eligible_gender}`);
+      if (info.eligible_states?.length && !info.eligible_states.includes('All')) parts.push(`📍 States: ${info.eligible_states.join(', ')}`);
+      if (info.eligible_castes?.length && !info.eligible_castes.includes('All')) parts.push(`👥 Castes: ${info.eligible_castes.join(', ')}`);
+      if (info.how_to_apply?.length) parts.push(`📝 How to Apply:\n${info.how_to_apply.map((s, i) => `${i + 1}. ${s}`).join('\n')}`);
+      if (info.documents_required?.length) parts.push(`📎 Documents Required: ${info.documents_required.join(', ')}`);
+      if (info.deadline) parts.push(`⏰ Deadline: ${info.deadline}`);
+      return parts.filter(Boolean).join('\n\n');
+    }
+
+    async function saveAIData(info, sourceUrl) {
+      showLoader(true);
+      try {
+        const richDesc = buildRichDescription(info);
+        const states = (info.eligible_states?.length ? info.eligible_states : ['All']);
+        const castes = (info.eligible_castes?.length ? info.eligible_castes : ['All']);
+
+        if (info.type === 'job') {
+          const payload = {
+            title: info.title,
+            organization: info.organization || null,
+            description: richDesc,
+            eligible_states: states,
+            eligible_castes: castes,
+          };
+          let { error } = await supabase.from('jobs').insert(payload);
+          if (error) {
+            console.warn('Full jobs insert failed, retry minimal:', error.message);
+            const min = { title: info.title, organization: info.organization || null };
+            const r2 = await supabase.from('jobs').insert(min);
+            if (r2.error) throw r2.error;
+          }
+        } else {
+          const payload = {
+            title: info.title,
+            description: richDesc,
+            type: info.type,
+            apply_link: info.apply_link || sourceUrl || null,
+            eligible_states: states,
+            eligible_castes: castes,
+          };
+          let { error } = await supabase.from('schemes').insert(payload);
+          if (error) {
+            console.warn('Full schemes insert failed, retry minimal:', error.message);
+            const min = { title: info.title, description: richDesc, type: info.type, apply_link: info.apply_link || sourceUrl || null };
+            const r2 = await supabase.from('schemes').insert(min);
+            if (r2.error) throw r2.error;
+          }
+        }
+
+        toast('✅ Published successfully!', 'success');
+        $('#ai-preview').classList.add('hidden');
+        const u = $('#ai-url-input'); if (u) u.value = '';
+        const r = $('#ai-raw-input'); if (r) r.value = '';
+        await loadData();
+        renderAll();
+      } catch (err) {
+        console.error(err);
+        toast('Save failed: ' + err.message, 'error');
+      } finally {
+        showLoader(false);
+      }
+    }
+
+    // ============================================================
+    // 9. ROUTER & EVENTS
     // ============================================================
     const VIEWS = ['home','scholarships','schemes','jobs','preparation','profile','admin'];
     function router() {
       let hash = (location.hash || '#home').replace('#','');
       if (!VIEWS.includes(hash)) hash = 'home';
-      
+
       const isAdmin = state.user && ADMIN_EMAILS.includes(state.user.email);
       if (hash === 'admin' && !isAdmin) { toast('Admin access only!', 'error'); location.hash = '#home'; return; }
 
@@ -449,7 +741,7 @@
       ['#btn-signout-top','#btn-signout-sidebar'].forEach(sel => {
         $(sel)?.addEventListener('click', signOut);
       });
-      
+
       $('#profile-form')?.addEventListener('submit', (e) => {
         e.preventDefault();
         saveProfile(new FormData(e.target));
@@ -461,29 +753,66 @@
         if(e.target.id === 'modal-overlay') $('#modal-overlay').classList.add('hidden');
       });
 
-      $('#btn-ai-parse')?.addEventListener('click', () => {
-        const text = $('#ai-raw-input').value;
-        if(!text) return toast('Enter text first', 'warn');
-        const prev = $('#ai-preview');
-        prev.classList.remove('hidden');
-        prev.innerHTML = `<b>Preview:</b> Title: ${text.split('.')[0]} <br><button class="mt-2 bg-emerald-600 text-white px-2 py-1 rounded">Save to DB</button>`;
+      // --- AI: Fetch URL & Analyze ---
+      $('#btn-ai-fetch')?.addEventListener('click', async () => {
+        const url = $('#ai-url-input').value.trim();
+        if (!url) return toast('Please enter a URL', 'warn');
+        if (!/^https?:\/\//i.test(url)) return toast('URL must start with http:// or https://', 'warn');
+
+        showLoader(true);
+        try {
+          toast('🌐 Fetching page…', 'info');
+          const html = await fetchPageContent(url);
+          const text = htmlToText(html);
+          if (!text || text.length < 80) throw new Error('Page content too short/empty');
+
+          toast('🤖 AI analyzing… (10–30s)', 'info');
+          const info = await callGemini(buildPrompt(url, text));
+          renderAIPreview(info, url);
+          toast('Analysis complete — review & save.', 'success');
+        } catch (err) {
+          console.error(err);
+          toast(err.message, 'error');
+        } finally {
+          showLoader(false);
+        }
+      });
+
+      // --- AI: Analyze raw text ---
+      $('#btn-ai-parse')?.addEventListener('click', async () => {
+        const text = $('#ai-raw-input').value.trim();
+        if (!text) return toast('Enter text first', 'warn');
+        if (text.length < 60) return toast('Text too short — paste more details', 'warn');
+
+        showLoader(true);
+        try {
+          toast('🤖 AI analyzing text…', 'info');
+          const info = await callGemini(buildPrompt('manual-input', text));
+          renderAIPreview(info, '');
+          toast('Analysis complete — review & save.', 'success');
+        } catch (err) {
+          console.error(err);
+          toast(err.message, 'error');
+        } finally {
+          showLoader(false);
+        }
       });
 
       window.addEventListener('hashchange', router);
     }
 
     // ============================================================
-    // 9. INITIALIZATION
+    // 10. INITIALIZATION
     // ============================================================
     async function init() {
       showLoader(true);
       try {
         const { data: { session } } = await supabase.auth.getSession();
         state.user = session?.user || null;
-        
+
         if (state.user) await loadProfile();
         await loadData();
-        
+
         bindEvents();
         renderAll();
         router();
