@@ -1,271 +1,930 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sagar's Vlog & Tech Space</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Supabase JS Library -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Career & Scheme Navigator</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Supabase JS SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    /* Glassmorphism utilities */
+    .glass {
+      background: rgba(255, 255, 255, 0.25);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+    .glass-dark {
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .gradient-bg {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    .card-hover {
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .card-hover:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+    /* Floating AI avatar pulse */
+    @keyframes pulse-ring {
+      0% { transform: scale(0.9); opacity: 0.6; }
+      50% { transform: scale(1.1); opacity: 0.3; }
+      100% { transform: scale(0.9); opacity: 0.6; }
+    }
+    .ai-pulse::before {
+      content: '';
+      position: absolute;
+      inset: -4px;
+      border-radius: 9999px;
+      background: linear-gradient(45deg, #667eea, #764ba2);
+      z-index: -1;
+      animation: pulse-ring 2s infinite;
+    }
+    /* Hide scrollbar for chat */
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen font-sans">
+<body class="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 min-h-screen font-inter">
 
-    <!-- Navigation Bar -->
-    <nav class="border-b border-slate-800 bg-slate-900/50 backdrop-blur sticky top-0 z-50 px-6 py-4 flex justify-between items-center">
-        <h1 class="text-xl font-bold tracking-wider text-cyan-400">Sagar's Vlog</h1>
-        <div id="nav-auth" class="flex items-center gap-4">
-            <!-- Dynamic Auth Button / User Info -->
+  <!-- ==================== NAVBAR ==================== -->
+  <nav class="glass sticky top-0 z-40 px-4 py-3 shadow-lg">
+    <div class="max-w-7xl mx-auto flex items-center justify-between flex-wrap gap-2">
+      <div class="flex items-center gap-2">
+        <span class="text-2xl">🎯</span>
+        <h1 class="text-lg md:text-xl font-bold text-gray-800">Career & Scheme Navigator</h1>
+      </div>
+      <div class="flex items-center gap-3 flex-wrap">
+        <!-- Language Switcher -->
+        <select id="languageSwitcher" class="text-sm bg-white/70 border border-gray-300 rounded-lg px-2 py-1 focus:ring-2 focus:ring-indigo-400 outline-none">
+          <option value="en">English</option>
+          <option value="hi">हिन्दी</option>
+          <option value="bn">বাংলা</option>
+          <option value="ta">தமிழ்</option>
+          <option value="te">తెలుగు</option>
+          <option value="mr">मराठी</option>
+        </select>
+        <!-- Auth Buttons -->
+        <button id="googleSignInBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm px-4 py-1.5 rounded-lg transition shadow">
+          <i class="fab fa-google mr-1"></i> Sign in with Google
+        </button>
+        <button id="signOutBtn" class="hidden bg-red-500 hover:bg-red-600 text-white text-sm px-4 py-1.5 rounded-lg transition shadow">
+          Sign Out
+        </button>
+        <img id="navAvatar" class="hidden w-8 h-8 rounded-full border-2 border-indigo-300 object-cover" alt="Profile" />
+      </div>
+    </div>
+  </nav>
+
+  <!-- ==================== MAIN CONTENT ==================== -->
+  <main class="max-w-7xl mx-auto p-4 md:p-6 pb-24">
+
+    <!-- ========== AUTH / WELCOME VIEW ========== -->
+    <section id="welcomeView" class="text-center py-20">
+      <h2 class="text-4xl md:text-5xl font-extrabold text-gray-800 mb-4" data-i18n="welcomeTitle">Welcome to Career & Scheme Navigator</h2>
+      <p class="text-lg text-gray-600 max-w-2xl mx-auto mb-8" data-i18n="welcomeSubtitle">
+        Discover government schemes, scholarships, and jobs tailored to your profile. Sign in with Google to get started.
+      </p>
+      <button id="welcomeSignInBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white text-lg px-8 py-3 rounded-xl shadow-lg transition">
+        Get Started with Google
+      </button>
+    </section>
+
+    <!-- ========== DASHBOARD / PROFILE VIEW ========== -->
+    <section id="dashboardView" class="hidden space-y-6">
+      <!-- Profile Card -->
+      <div class="glass rounded-2xl p-6 shadow-xl">
+        <div class="flex flex-col md:flex-row items-start md:items-center gap-4">
+          <div class="relative">
+            <img id="profileAvatar" class="w-24 h-24 rounded-full border-4 border-white shadow-lg object-cover bg-gray-200" alt="Profile" />
+            <input type="file" id="avatarUpload" accept="image/*" class="hidden" />
+            <button id="uploadAvatarBtn" class="absolute bottom-0 right-0 bg-indigo-600 text-white rounded-full p-1.5 text-xs shadow" title="Upload photo">📷</button>
+          </div>
+          <div class="flex-1">
+            <h3 id="profileName" class="text-2xl font-bold text-gray-800">Loading...</h3>
+            <p id="profileEmail" class="text-sm text-gray-500"></p>
+            <p class="text-xs text-indigo-600 mt-1" data-i18n="profileHint">Complete your profile to get accurate matches.</p>
+          </div>
+          <button id="editProfileBtn" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm transition" data-i18n="editProfile">Edit Profile</button>
         </div>
-    </nav>
+      </div>
 
-    <!-- Main Container -->
-    <main class="max-w-4xl mx-auto px-4 py-8 space-y-12">
+      <!-- Profile Form (collapsible) -->
+      <div id="profileFormContainer" class="hidden glass rounded-2xl p-6 shadow-xl">
+        <h3 class="text-xl font-bold mb-4" data-i18n="profileDetails">Profile Details</h3>
+        <form id="profileForm" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div>
+            <label class="text-xs font-medium text-gray-600">Full Name</label>
+            <input type="text" id="inputName" class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-400 outline-none" required />
+          </div>
+          <div>
+            <label class="text-xs font-medium text-gray-600">Age</label>
+            <input type="number" id="inputAge" class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-400 outline-none" />
+          </div>
+          <div>
+            <label class="text-xs font-medium text-gray-600">Date of Birth</label>
+            <input type="date" id="inputDob" class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-400 outline-none" />
+          </div>
+          <div>
+            <label class="text-xs font-medium text-gray-600">Gender</label>
+            <select id="inputGender" class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-400 outline-none">
+              <option value="">Select</option>
+              <option>Male</option>
+              <option>Female</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-xs font-medium text-gray-600">State</label>
+            <select id="inputState" class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-400 outline-none">
+              <option value="">Select State</option>
+              <option>West Bengal</option>
+              <option>Delhi</option>
+              <option>Maharashtra</option>
+              <option>Tamil Nadu</option>
+              <option>Karnataka</option>
+              <option>Uttar Pradesh</option>
+              <option>Bihar</option>
+              <option>Rajasthan</option>
+              <option>Gujarat</option>
+              <option>Kerala</option>
+              <option>Telangana</option>
+              <option>Andhra Pradesh</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-xs font-medium text-gray-600">District</label>
+            <input type="text" id="inputDistrict" class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-400 outline-none" placeholder="e.g., Kolkata" />
+          </div>
+          <div>
+            <label class="text-xs font-medium text-gray-600">Caste / Community</label>
+            <select id="inputCaste" class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-400 outline-none">
+              <option value="">Select</option>
+              <option>General</option>
+              <option>OBC</option>
+              <option>SC</option>
+              <option>ST</option>
+              <option>EWS</option>
+              <option>Minority</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-xs font-medium text-gray-600">Class 10 Passing Year</label>
+            <input type="number" id="inputClass10Year" class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-400 outline-none" placeholder="e.g., 2020" />
+          </div>
+          <div>
+            <label class="text-xs font-medium text-gray-600">Class 10 Percentage</label>
+            <input type="number" step="0.01" id="inputClass10Percent" class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-400 outline-none" placeholder="e.g., 85.5" />
+          </div>
+          <div>
+            <label class="text-xs font-medium text-gray-600">Class 12 Passing Year</label>
+            <input type="number" id="inputClass12Year" class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-400 outline-none" placeholder="e.g., 2022" />
+          </div>
+          <div>
+            <label class="text-xs font-medium text-gray-600">Class 12 Percentage</label>
+            <input type="number" step="0.01" id="inputClass12Percent" class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-400 outline-none" placeholder="e.g., 78.0" />
+          </div>
+          <div>
+            <label class="text-xs font-medium text-gray-600">Highest Degree</label>
+            <input type="text" id="inputHigherDegree" class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-400 outline-none" placeholder="e.g., B.Tech" />
+          </div>
+          <div>
+            <label class="text-xs font-medium text-gray-600">Higher Degree Percentage</label>
+            <input type="number" step="0.01" id="inputHigherPercent" class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-400 outline-none" placeholder="e.g., 8.2 CGPA" />
+          </div>
+          <div class="md:col-span-2 lg:col-span-3 flex justify-end gap-2 mt-2">
+            <button type="button" id="cancelProfileBtn" class="bg-gray-300 hover:bg-gray-400 px-4 py-2 rounded-lg text-sm transition">Cancel</button>
+            <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg text-sm transition shadow">Save Profile</button>
+          </div>
+        </form>
+      </div>
 
-        <!-- Hero Section -->
-        <header class="text-center space-y-4 py-8 bg-gradient-to-r from-cyan-950/40 to-slate-900 border border-slate-800 rounded-3xl p-8 shadow-2xl">
-            <h2 class="text-3xl md:text-5xl font-extrabold text-white">Welcome to My Digital Diary & Tech Blog</h2>
-            <p class="text-slate-400 text-sm md:text-base max-w-xl mx-auto">Exploring B.Tech CSE life, full-stack web development, bansuri melodies, and retro gaming adventures.</p>
-        </header>
-
-        <!-- Loading State -->
-        <div id="loading" class="text-center py-12 text-slate-400 animate-pulse">
-            Loading your experience...
+      <!-- Matched Opportunities -->
+      <div>
+        <h3 class="text-2xl font-bold text-gray-800 mb-4" data-i18n="matchedOpportunities">Matched Opportunities</h3>
+        <div id="matchedContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <!-- Dynamic cards inserted here -->
         </div>
+      </div>
 
-        <!-- Login Card (Hidden if logged in) -->
-        <section id="auth-section" class="hidden max-w-md mx-auto bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl text-center space-y-6">
-            <div>
-                <h3 class="text-lg font-bold text-slate-200">Join the Community</h3>
-                <p class="text-xs text-slate-400 mt-1">Sign in securely with your Google account to write and manage vlogs.</p>
-            </div>
-            <div id="error-msg" class="text-red-400 text-xs hidden"></div>
-            <button onclick="handleGoogleLogin()" class="w-full flex items-center justify-center gap-3 bg-white hover:bg-slate-100 text-slate-900 font-semibold py-3 rounded-xl text-sm transition-all shadow-lg cursor-pointer">
-                <svg class="w-5 h-5" viewBox="0 0 24 24">
-                    <path fill="#4285F4" d="M23.745 12.27c-.07-.8-.64-1.54-1.44-1.77H12v4.51h6.61c-.29 1.54-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.65-5.17 3.65-8.82z"/>
-                    <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.11-6.72-4.95H1.2v3.15C3.18 21.31 7.24 24 12 24z"/>
-                    <path fill="#FBBC05" d="M5.28 14.25c-.25-.72-.39-1.49-.39-2.25s.14-1.53.39-2.25V6.6H1.2C.44 8.15 0 9.9 0 12s.44 3.85 1.2 5.4l4.08-3.15z"/>
-                    <path fill="#EA4335" d="M12 4.75c1.76 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.24 0 3.18 2.69 1.2 6.6l4.08 3.15c.95-2.84 3.6-4.95 6.72-4.95z"/>
-                </svg>
-                Continue with Google
-            </button>
-        </section>
+      <!-- Section Tabs -->
+      <div class="glass rounded-2xl p-6 shadow-xl">
+        <div class="flex gap-2 border-b border-gray-200 pb-2 mb-4 flex-wrap">
+          <button data-tab="schemes" class="tab-btn px-4 py-2 text-sm font-medium rounded-lg bg-indigo-600 text-white" data-i18n="schemes">Schemes</button>
+          <button data-tab="scholarships" class="tab-btn px-4 py-2 text-sm font-medium rounded-lg bg-gray-200 text-gray-700" data-i18n="scholarships">Scholarships</button>
+          <button data-tab="jobs" class="tab-btn px-4 py-2 text-sm font-medium rounded-lg bg-gray-200 text-gray-700" data-i18n="jobs">Jobs</button>
+          <button data-tab="prep" class="tab-btn px-4 py-2 text-sm font-medium rounded-lg bg-gray-200 text-gray-700" data-i18n="preparation">Preparation Hub</button>
+          <button data-tab="admin" id="adminTabBtn" class="hidden tab-btn px-4 py-2 text-sm font-medium rounded-lg bg-gray-200 text-gray-700">Admin AI</button>
+        </div>
+        <div id="tabContent" class="space-y-4">
+          <!-- Dynamic content based on tab -->
+        </div>
+      </div>
+    </section>
+  </main>
 
-        <!-- Vlog Upload Section (Only for Logged-in Users) -->
-        <section id="upload-section" class="hidden bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
-            <h3 class="text-lg font-bold text-cyan-400">✍️ Publish a New Vlog</h3>
-            <form id="vlog-form" onsubmit="handleVlogSubmit(event)" class="space-y-4">
-                <div>
-                    <label class="block text-xs text-slate-400 mb-1">Vlog Title</label>
-                    <input type="text" id="vlog-title" required placeholder="Enter vlog title..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-500">
-                </div>
-                <div>
-                    <label class="block text-xs text-slate-400 mb-1">Vlog Content / Description</label>
-                    <textarea id="vlog-desc" rows="3" required placeholder="Write your thoughts..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-500"></textarea>
-                </div>
-                
-                <!-- Public/Private Toggle -->
-                <div class="flex items-center gap-2 bg-slate-950 p-3 rounded-xl border border-slate-800">
-                    <input type="checkbox" id="vlog-public" checked class="w-4 h-4 accent-cyan-500 cursor-pointer">
-                    <label for="vlog-public" class="text-xs text-slate-300 cursor-pointer select-none">
-                        Make this vlog <strong>Public</strong> (Anyone can see this). Uncheck to keep it Private.
-                    </label>
-                </div>
+  <!-- ==================== FLOATING AI ASSISTANT ==================== -->
+  <div id="aiAssistantContainer" class="fixed bottom-6 right-6 z-50">
+    <!-- Chat Window (hidden by default) -->
+    <div id="aiChatWindow" class="hidden mb-4 w-80 md:w-96 glass-dark rounded-2xl shadow-2xl overflow-hidden">
+      <div class="bg-indigo-600 text-white px-4 py-3 flex justify-between items-center">
+        <div class="flex items-center gap-2">
+          <span class="text-xl">🤖</span>
+          <span class="font-semibold text-sm">AI Assistant</span>
+        </div>
+        <button id="closeAiChat" class="text-white hover:text-gray-200 text-xl leading-none">&times;</button>
+      </div>
+      <div id="aiChatMessages" class="h-64 overflow-y-auto p-4 space-y-3 text-sm no-scrollbar"></div>
+      <div class="p-3 border-t border-gray-600 flex gap-2">
+        <input id="aiChatInput" type="text" placeholder="Ask about eligibility..." class="flex-1 px-3 py-2 bg-gray-700 text-white rounded-lg text-sm outline-none placeholder-gray-400" />
+        <button id="aiSendBtn" class="bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm">Send</button>
+      </div>
+    </div>
+    <!-- Floating Avatar -->
+    <button id="aiAvatarBtn" class="ai-pulse relative w-16 h-16 rounded-full gradient-bg text-white flex items-center justify-center text-2xl shadow-2xl hover:scale-105 transition">
+      🤖
+    </button>
+  </div>
 
-                <button type="submit" id="submit-btn" class="bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-semibold px-6 py-2.5 rounded-xl text-xs transition-all cursor-pointer">Publish Vlog</button>
-            </form>
-        </section>
+  <!-- ==================== SCRIPTS ==================== -->
+  <script>
+    // ============================================================
+    // 1. CONFIGURATION
+    // ============================================================
+    const SUPABASE_URL = 'https://kzbhpwtcsowzivgpellr.supabase.co';
+    // ⚠️ Replace with your actual Supabase anon/public key
+    const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+    const GEMINI_KEY_USER = 'AQ.Ab8RN6Lz0zAAsSg-QHO8PCt7yZMuGkd90sp7xpQE4T7BMZvf9A'; // User AI
+    const GEMINI_KEY_ADMIN = 'AQ.Ab8RN6JQAOVKUQ5TarYxR-xRxdmvfo0AwWQHvdOx86yArGLHYA'; // Admin AI
 
-        <!-- Vlog Feed Grid -->
-        <section class="space-y-6">
-            <h3 class="text-xl font-bold text-white border-b border-slate-800 pb-3">Recent Vlogs</h3>
-            <div id="vlog-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Vlogs will be injected here dynamically -->
-            </div>
-            <div id="no-vlogs" class="hidden text-center text-slate-500 py-8">No vlogs found. Be the first to post!</div>
-        </section>
+    // Initialize Supabase client
+    const { createClient } = supabase;
+    const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    </main>
+    // ============================================================
+    // 2. INTERNATIONALIZATION (i18n)
+    // ============================================================
+    const translations = {
+      en: {
+        welcomeTitle: "Welcome to Career & Scheme Navigator",
+        welcomeSubtitle: "Discover government schemes, scholarships, and jobs tailored to your profile.",
+        profileHint: "Complete your profile to get accurate matches.",
+        editProfile: "Edit Profile",
+        profileDetails: "Profile Details",
+        matchedOpportunities: "Matched Opportunities",
+        schemes: "Schemes",
+        scholarships: "Scholarships",
+        jobs: "Jobs",
+        preparation: "Preparation Hub",
+      },
+      hi: {
+        welcomeTitle: "करियर और योजना नेविगेटर में आपका स्वागत है",
+        welcomeSubtitle: "अपनी प्रोफ़ाइल के अनुसार सरकारी योजनाएं, छात्रवृत्तियां और नौकरियां खोजें।",
+        profileHint: "सटीक मिलान के लिए अपनी प्रोफ़ाइल पूरी करें।",
+        editProfile: "प्रोफ़ाइल संपादित करें",
+        profileDetails: "प्रोफ़ाइल विवरण",
+        matchedOpportunities: "मिलान वाले अवसर",
+        schemes: "योजनाएं",
+        scholarships: "छात्रवृत्तियां",
+        jobs: "नौकरियां",
+        preparation: "तैयारी केंद्र",
+      },
+      bn: {
+        welcomeTitle: "ক্যারিয়ার অ্যান্ড স্কিম নেভিগেটরে স্বাগতম",
+        welcomeSubtitle: "আপনার প্রোফাইল অনুযায়ী সরকারি স্কিম, বৃত্তি এবং চাকরি খুঁজুন।",
+        profileHint: "সঠিক মিলের জন্য আপনার প্রোফাইল সম্পূর্ণ করুন।",
+        editProfile: "প্রোফাইল সম্পাদনা",
+        profileDetails: "প্রোফাইল বিবরণ",
+        matchedOpportunities: "মিলে যাওয়া সুযোগ",
+        schemes: "স্কিম",
+        scholarships: "বৃত্তি",
+        jobs: "চাকরি",
+        preparation: "প্রস্তুতি হাব",
+      },
+      ta: {
+        welcomeTitle: "கரியர் & திட்ட வழிகாட்டிக்கு வரவேற்கிறோம்",
+        welcomeSubtitle: "உங்கள் சுயவிவரத்திற்கு ஏற்ப அரசு திட்டங்கள், கல்வி உதவித்தொகைகள் மற்றும் வேலைகளைக் கண்டறியுங்கள்.",
+        profileHint: "துல்லியமான பொருத்தங்களுக்கு உங்கள் சுயவிவரத்தை முடிக்கவும்.",
+        editProfile: "சுயவிவரத்தைத் திருத்து",
+        profileDetails: "சுயவிவர விவரங்கள்",
+        matchedOpportunities: "பொருந்தும் வாய்ப்புகள்",
+        schemes: "திட்டங்கள்",
+        scholarships: "கல்வி உதவித்தொகைகள்",
+        jobs: "வேலைகள்",
+        preparation: "தயாரிப்பு மையம்",
+      },
+      te: {
+        welcomeTitle: "కెరీర్ & స్కీమ్ నావిగేటర్కు స్వాగతం",
+        welcomeSubtitle: "మీ ప్రొఫైల్కు తగిన ప్రభుత్వ పథకాలు, స్కాలర్షిప్లు మరియు ఉద్యోగాలను కనుగొనండి.",
+        profileHint: "ఖచ్చితమైన మ్యాచ్ల కోసం మీ ప్రొఫైల్ను పూర్తి చేయండి.",
+        editProfile: "ప్రొఫైల్ సవరించు",
+        profileDetails: "ప్రొఫైల్ వివరాలు",
+        matchedOpportunities: "సరిపోలిన అవకాశాలు",
+        schemes: "పథకాలు",
+        scholarships: "స్కాలర్షిప్లు",
+        jobs: "ఉద్యోగాలు",
+        preparation: "తయారీ కేంద్రం",
+      },
+      mr: {
+        welcomeTitle: "करिअर आणि योजना नेव्हिगेटरमध्ये आपले स्वागत आहे",
+        welcomeSubtitle: "तुमच्या प्रोफाइलनुसार सरकारी योजना, शिष्यवृत्ती आणि नोकऱ्या शोधा.",
+        profileHint: "अचूक जुळणीसाठी तुमचे प्रोफाइल पूर्ण करा.",
+        editProfile: "प्रोफाइल संपादित करा",
+        profileDetails: "प्रोफाइल तपशील",
+        matchedOpportunities: "जुळलेल्या संधी",
+        schemes: "योजना",
+        scholarships: "शिष्यवृत्ती",
+        jobs: "नोकऱ्या",
+        preparation: "तयारी केंद्र",
+      }
+    };
 
-    <!-- Footer -->
-    <footer class="text-center py-8 text-slate-500 text-xs border-t border-slate-900 mt-16">
-        © 2026 Sagar Biswas. Built with HTML, Tailwind & Supabase.
-    </footer>
+    let currentLang = localStorage.getItem('lang') || 'en';
 
-    <!-- Script Logic -->
-    <script>
-        const SUPABASE_URL = 'https://kzbhpwtcsowzivgpellr.supabase.co';
-        const SUPABASE_ANON_KEY = 'sb_publishable_RUO7ScIOI8q5r8_iH5udVA_WmbrdwLf'; 
+    function applyLanguage(lang) {
+      currentLang = lang;
+      localStorage.setItem('lang', lang);
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (translations[lang] && translations[lang][key]) {
+          el.textContent = translations[lang][key];
+        }
+      });
+      // Update dynamic content if needed
+      if (currentUser) loadMatchedOpportunities();
+    }
 
-        const { createClient } = supabase;
-        const _supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-            auth: {
-                persistSession: true,
-                autoRefreshToken: true,
-                detectSessionInUrl: true
-            }
+    document.getElementById('languageSwitcher').addEventListener('change', (e) => {
+      applyLanguage(e.target.value);
+    });
+
+    // ============================================================
+    // 3. SUPABASE AUTH & DATABASE
+    // ============================================================
+    let currentUser = null;
+
+    // Sign in with Google
+    async function signInWithGoogle() {
+      const { data, error } = await supabaseClient.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: window.location.origin,
+        },
+      });
+      if (error) {
+        console.error('Google sign-in error:', error);
+        alert('Sign-in failed: ' + error.message);
+      }
+    }
+
+    // Sign out
+    async function signOut() {
+      const { error } = await supabaseClient.auth.signOut();
+      if (error) console.error('Sign-out error:', error);
+    }
+
+    // Listen for auth state changes
+    supabaseClient.auth.onAuthStateChange(async (event, session) => {
+      if (session?.user) {
+        currentUser = session.user;
+        showDashboard();
+        await loadUserProfile();
+        await loadMatchedOpportunities();
+      } else {
+        currentUser = null;
+        showWelcome();
+      }
+    });
+
+    // Check initial session
+    (async () => {
+      const { data: { session } } = await supabaseClient.auth.getSession();
+      if (session?.user) {
+        currentUser = session.user;
+        showDashboard();
+        await loadUserProfile();
+        await loadMatchedOpportunities();
+      } else {
+        showWelcome();
+      }
+    })();
+
+    function showDashboard() {
+      document.getElementById('welcomeView').classList.add('hidden');
+      document.getElementById('dashboardView').classList.remove('hidden');
+      document.getElementById('googleSignInBtn').classList.add('hidden');
+      document.getElementById('signOutBtn').classList.remove('hidden');
+      document.getElementById('navAvatar').classList.remove('hidden');
+      // Show admin tab if user email is admin (customize as needed)
+      if (currentUser?.email === 'admin@example.com') {
+        document.getElementById('adminTabBtn').classList.remove('hidden');
+      }
+    }
+
+    function showWelcome() {
+      document.getElementById('welcomeView').classList.remove('hidden');
+      document.getElementById('dashboardView').classList.add('hidden');
+      document.getElementById('googleSignInBtn').classList.remove('hidden');
+      document.getElementById('signOutBtn').classList.add('hidden');
+      document.getElementById('navAvatar').classList.add('hidden');
+    }
+
+    // Load user profile from Supabase
+    async function loadUserProfile() {
+      if (!currentUser) return;
+      const { data, error } = await supabaseClient
+        .from('Users')
+        .select('*')
+        .eq('id', currentUser.id)
+        .maybeSingle();
+
+      if (error) {
+        console.error('Error loading profile:', error);
+        return;
+      }
+
+      if (data) {
+        // Populate profile display
+        document.getElementById('profileName').textContent = data.name || currentUser.email;
+        document.getElementById('profileEmail').textContent = currentUser.email;
+        if (data.avatar_url) {
+          document.getElementById('profileAvatar').src = data.avatar_url;
+          document.getElementById('navAvatar').src = data.avatar_url;
+        }
+        // Populate form fields
+        document.getElementById('inputName').value = data.name || '';
+        document.getElementById('inputAge').value = data.age || '';
+        document.getElementById('inputDob').value = data.dob || '';
+        document.getElementById('inputGender').value = data.gender || '';
+        document.getElementById('inputState').value = data.state || '';
+        document.getElementById('inputDistrict').value = data.district || '';
+        document.getElementById('inputCaste').value = data.caste || '';
+        document.getElementById('inputClass10Year').value = data.class10_year || '';
+        document.getElementById('inputClass10Percent').value = data.class10_percentage || '';
+        document.getElementById('inputClass12Year').value = data.class12_year || '';
+        document.getElementById('inputClass12Percent').value = data.class12_percentage || '';
+        document.getElementById('inputHigherDegree').value = data.higher_degree || '';
+        document.getElementById('inputHigherPercent').value = data.higher_percentage || '';
+      } else {
+        // New user: set default name
+        document.getElementById('profileName').textContent = currentUser.user_metadata?.full_name || currentUser.email;
+      }
+    }
+
+    // Save profile
+    document.getElementById('profileForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!currentUser) return;
+
+      const profileData = {
+        id: currentUser.id,
+        name: document.getElementById('inputName').value,
+        age: parseInt(document.getElementById('inputAge').value) || null,
+        dob: document.getElementById('inputDob').value || null,
+        gender: document.getElementById('inputGender').value || null,
+        state: document.getElementById('inputState').value || null,
+        district: document.getElementById('inputDistrict').value || null,
+        caste: document.getElementById('inputCaste').value || null,
+        class10_year: parseInt(document.getElementById('inputClass10Year').value) || null,
+        class10_percentage: parseFloat(document.getElementById('inputClass10Percent').value) || null,
+        class12_year: parseInt(document.getElementById('inputClass12Year').value) || null,
+        class12_percentage: parseFloat(document.getElementById('inputClass12Percent').value) || null,
+        higher_degree: document.getElementById('inputHigherDegree').value || null,
+        higher_percentage: parseFloat(document.getElementById('inputHigherPercent').value) || null,
+      };
+
+      const { error } = await supabaseClient
+        .from('Users')
+        .upsert(profileData, { onConflict: 'id' });
+
+      if (error) {
+        console.error('Error saving profile:', error);
+        alert('Failed to save profile: ' + error.message);
+      } else {
+        alert('Profile saved successfully!');
+        document.getElementById('profileFormContainer').classList.add('hidden');
+        await loadUserProfile();
+        await loadMatchedOpportunities();
+      }
+    });
+
+    // Toggle profile form
+    document.getElementById('editProfileBtn').addEventListener('click', () => {
+      document.getElementById('profileFormContainer').classList.toggle('hidden');
+    });
+    document.getElementById('cancelProfileBtn').addEventListener('click', () => {
+      document.getElementById('profileFormContainer').classList.add('hidden');
+    });
+
+    // Avatar upload
+    document.getElementById('uploadAvatarBtn').addEventListener('click', () => {
+      document.getElementById('avatarUpload').click();
+    });
+
+    document.getElementById('avatarUpload').addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (!file || !currentUser) return;
+
+      const fileExt = file.name.split('.').pop();
+      const filePath = `${currentUser.id}/avatar.${fileExt}`;
+
+      const { error: uploadError } = await supabaseClient.storage
+        .from('avatars')
+        .upload(filePath, file, { upsert: true });
+
+      if (uploadError) {
+        console.error('Upload error:', uploadError);
+        alert('Upload failed: ' + uploadError.message);
+        return;
+      }
+
+      const { data: urlData } = supabaseClient.storage
+        .from('avatars')
+        .getPublicUrl(filePath);
+
+      const avatarUrl = urlData.publicUrl;
+
+      await supabaseClient.from('Users').update({ avatar_url: avatarUrl }).eq('id', currentUser.id);
+      document.getElementById('profileAvatar').src = avatarUrl;
+      document.getElementById('navAvatar').src = avatarUrl;
+    });
+
+    // ============================================================
+    // 4. OPPORTUNITY DATA & MATCHING
+    // ============================================================
+    // Mock data (in production, fetch from Supabase 'opportunities' table)
+    const mockOpportunities = [
+      {
+        id: 1,
+        type: 'scheme',
+        title: 'West Bengal Student Credit Card',
+        description: 'Provides education loans up to ₹10 lakh at low interest for higher studies in West Bengal.',
+        state: 'West Bengal',
+        caste: 'All',
+        age_min: 18,
+        age_max: 40,
+        percentage_required: null,
+        official_link: 'https://wbscc.wb.gov.in',
+        benefits: 'Low-interest education loan',
+      },
+      {
+        id: 2,
+        type: 'scholarship',
+        title: 'Post-Matric Scholarship for SC Students',
+        description: 'Financial assistance for SC students pursuing post-matriculation courses.',
+        state: 'All',
+        caste: 'SC',
+        age_min: 15,
+        age_max: 30,
+        percentage_required: 50,
+        official_link: 'https://scholarships.gov.in',
+        benefits: 'Tuition fee + maintenance allowance',
+      },
+      {
+        id: 3,
+        type: 'job',
+        title: 'West Bengal Police Constable Recruitment',
+        description: 'Recruitment for Constable posts in West Bengal Police.',
+        state: 'West Bengal',
+        caste: 'All',
+        age_min: 18,
+        age_max: 27,
+        percentage_required: 50,
+        official_link: 'https://wbpolice.gov.in',
+        cutoff_previous_year: 'General: 65, OBC: 60, SC/ST: 55',
+      },
+      {
+        id: 4,
+        type: 'scholarship',
+        title: 'National Merit-cum-Means Scholarship',
+        description: 'For meritorious students from minority communities.',
+        state: 'All',
+        caste: 'Minority',
+        age_min: 15,
+        age_max: 25,
+        percentage_required: 55,
+        official_link: 'https://scholarships.gov.in',
+        benefits: '₹20,000 per year',
+      },
+      {
+        id: 5,
+        type: 'scheme',
+        title: 'Ayushman Bharat PM-JAY',
+        description: 'Health insurance cover of ₹5 lakh per family per year for secondary and tertiary care.',
+        state: 'All',
+        caste: 'All',
+        age_min: 0,
+        age_max: 100,
+        percentage_required: null,
+        official_link: 'https://pmjay.gov.in',
+        benefits: '₹5 lakh health cover',
+      },
+      {
+        id: 6,
+        type: 'job',
+        title: 'SSC CGL (Staff Selection Commission - Combined Graduate Level)',
+        description: 'Recruitment for various Group B and C posts in central government ministries.',
+        state: 'All',
+        caste: 'All',
+        age_min: 18,
+        age_max: 32,
+        percentage_required: 50,
+        official_link: 'https://ssc.nic.in',
+        cutoff_previous_year: 'General: 150+, OBC: 140+, SC/ST: 130+',
+      },
+    ];
+
+    // Filter opportunities based on user profile
+    function filterOpportunities(profile, type = null) {
+      let filtered = mockOpportunities;
+      if (type) filtered = filtered.filter(o => o.type === type);
+
+      if (!profile) return filtered;
+
+      return filtered.filter(o => {
+        // State match
+        if (o.state !== 'All' && profile.state && o.state !== profile.state) return false;
+        // Caste match
+        if (o.caste !== 'All' && profile.caste && o.caste !== profile.caste) return false;
+        // Age match
+        if (o.age_min != null && profile.age != null && profile.age < o.age_min) return false;
+        if (o.age_max != null && profile.age != null && profile.age > o.age_max) return false;
+        // Percentage match (use class 12 or higher)
+        const userPercent = profile.class12_percentage || profile.higher_percentage;
+        if (o.percentage_required != null && userPercent != null && userPercent < o.percentage_required) return false;
+        return true;
+      });
+    }
+
+    async function loadMatchedOpportunities() {
+      if (!currentUser) return;
+      const { data: profile } = await supabaseClient
+        .from('Users')
+        .select('*')
+        .eq('id', currentUser.id)
+        .maybeSingle();
+
+      const matched = filterOpportunities(profile);
+      const container = document.getElementById('matchedContainer');
+      container.innerHTML = '';
+
+      if (matched.length === 0) {
+        container.innerHTML = '<p class="text-gray-500 col-span-full text-center py-8">No matches found. Complete your profile or check back later.</p>';
+        return;
+      }
+
+      matched.slice(0, 6).forEach(opp => {
+        const card = document.createElement('div');
+        card.className = 'glass card-hover rounded-xl p-4 shadow-lg';
+        card.innerHTML = `
+          <span class="text-xs font-semibold px-2 py-1 rounded-full ${opp.type === 'scheme' ? 'bg-blue-100 text-blue-700' : opp.type === 'scholarship' ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-700'}">${opp.type}</span>
+          <h4 class="font-bold text-gray-800 mt-2">${opp.title}</h4>
+          <p class="text-sm text-gray-600 mt-1 line-clamp-2">${opp.description}</p>
+          <div class="mt-3 flex flex-wrap gap-1 text-xs text-gray-500">
+            ${opp.state !== 'All' ? `<span>📍 ${opp.state}</span>` : ''}
+            ${opp.caste !== 'All' ? `<span>👥 ${opp.caste}</span>` : ''}
+            ${opp.age_min != null ? `<span>🎂 ${opp.age_min}-${opp.age_max} yrs</span>` : ''}
+            ${opp.percentage_required != null ? `<span>📊 ≥${opp.percentage_required}%</span>` : ''}
+          </div>
+          <a href="${opp.official_link}" target="_blank" class="mt-3 inline-block text-indigo-600 text-sm font-medium hover:underline">Apply / Learn More →</a>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    // ============================================================
+    // 5. TAB CONTENT RENDERING
+    // ============================================================
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        // Update active styles
+        document.querySelectorAll('.tab-btn').forEach(b => {
+          b.classList.remove('bg-indigo-600', 'text-white');
+          b.classList.add('bg-gray-200', 'text-gray-700');
         });
+        btn.classList.remove('bg-gray-200', 'text-gray-700');
+        btn.classList.add('bg-indigo-600', 'text-white');
 
-        const loadingEl = document.getElementById('loading');
-        const authSection = document.getElementById('auth-section');
-        const uploadSection = document.getElementById('upload-section');
-        const navAuth = document.getElementById('nav-auth');
-        const errorMsgEl = document.getElementById('error-msg');
-        const vlogGrid = document.getElementById('vlog-grid');
-        const noVlogsEl = document.getElementById('no-vlogs');
+        const tab = btn.dataset.tab;
+        renderTabContent(tab);
+      });
+    });
 
-        let currentUser = null;
+    async function renderTabContent(tab) {
+      const container = document.getElementById('tabContent');
+      container.innerHTML = '';
 
-        async function initApp() {
-            const { data: { session }, error } = await _supabase.auth.getSession();
-            currentUser = session ? session.user : null;
-            
-            updateUI(session);
-            await fetchVlogs(); // ডাটাবেস থেকে ভ্লগ আনা
+      if (tab === 'prep') {
+        // Preparation hub with YouTube videos
+        container.innerHTML = `
+          <h3 class="text-xl font-bold mb-4">🎓 Preparation Hub</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="glass rounded-xl p-4">
+              <h4 class="font-semibold text-gray-800 mb-2">Quantitative Aptitude</h4>
+              <iframe class="w-full rounded-lg" height="200" src="https://www.youtube.com/embed/8m1bq6g4VjE" title="Quantitative Aptitude" allowfullscreen></iframe>
+            </div>
+            <div class="glass rounded-xl p-4">
+              <h4 class="font-semibold text-gray-800 mb-2">Reasoning Ability</h4>
+              <iframe class="w-full rounded-lg" height="200" src="https://www.youtube.com/embed/5G5X7lK3q2w" title="Reasoning" allowfullscreen></iframe>
+            </div>
+            <div class="glass rounded-xl p-4">
+              <h4 class="font-semibold text-gray-800 mb-2">English Language</h4>
+              <iframe class="w-full rounded-lg" height="200" src="https://www.youtube.com/embed/9Z4n5Xq2Y8E" title="English" allowfullscreen></iframe>
+            </div>
+            <div class="glass rounded-xl p-4">
+              <h4 class="font-semibold text-gray-800 mb-2">General Awareness</h4>
+              <iframe class="w-full rounded-lg" height="200" src="https://www.youtube.com/embed/2Xj5Z3q8Y4E" title="General Awareness" allowfullscreen></iframe>
+            </div>
+          </div>
+        `;
+        return;
+      }
 
-            _supabase.auth.onAuthStateChange(async (event, session) => {
-                currentUser = session ? session.user : null;
-                updateUI(session);
-                await fetchVlogs(); // লগইন/লগআউট হলে ভ্লগ রিফ্রেশ হবে
-            });
-        }
+      if (tab === 'admin') {
+        // Admin AI interface
+        container.innerHTML = `
+          <h3 class="text-xl font-bold mb-2">🤖 Admin AI Auto-Updater</h3>
+          <p class="text-sm text-gray-600 mb-4">Paste unstructured text about a scheme, scholarship, or job. The AI will parse it into JSON and save it to the database.</p>
+          <textarea id="adminAiInput" rows="6" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-400 outline-none" placeholder="Paste scheme details here..."></textarea>
+          <button id="adminAiProcessBtn" class="mt-3 bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg text-sm transition shadow">Parse & Save with AI</button>
+          <div id="adminAiResult" class="mt-4 text-sm"></div>
+        `;
 
-        function updateUI(session) {
-            loadingEl.classList.add('hidden');
-            if (session) {
-                authSection.classList.add('hidden');
-                uploadSection.classList.remove('hidden');
-                navAuth.innerHTML = `
-                    <div class="flex items-center gap-3">
-                        <span class="text-xs text-cyan-300 hidden md:inline font-medium">${session.user.email}</span>
-                        <button onclick="handleLogout()" class="bg-red-600/20 hover:bg-red-600/30 text-red-400 border border-red-900/50 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer">Logout</button>
-                    </div>
-                `;
-            } else {
-                authSection.classList.remove('hidden');
-                uploadSection.classList.add('hidden');
-                navAuth.innerHTML = `
-                    <button onclick="document.getElementById('auth-section').scrollIntoView({behavior: 'smooth'})" class="bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-semibold px-4 py-2 rounded-xl text-xs transition-all cursor-pointer">Sign In</button>
-                `;
-            }
-        }
+        document.getElementById('adminAiProcessBtn').addEventListener('click', async () => {
+          const text = document.getElementById('adminAiInput').value.trim();
+          if (!text) return alert('Please paste some text first.');
+          const resultDiv = document.getElementById('adminAiResult');
+          resultDiv.innerHTML = '<p class="text-indigo-600">Processing with Gemini AI...</p>';
 
-        // ডাটাবেস থেকে ভ্লগ নিয়ে আসা
-        async function fetchVlogs() {
-            // RLS পলিসি অনুযায়ী ডাটা ফিল্টার হয়ে আসবে (পাবলিক + নিজের প্রাইভেট)
-            const { data, error } = await _supabase
-                .from('vlogs')
-                .select('*')
-                .order('created_at', { ascending: false });
+          try {
+            const parsed = await callGeminiAdmin(text);
+            if (!parsed) throw new Error('No response from AI');
 
-            if (error) {
-                console.error('Error fetching vlogs:', error);
-                return;
-            }
+            // Insert into Supabase (assumes 'opportunities' table exists)
+            const { error } = await supabaseClient.from('opportunities').insert([parsed]);
+            if (error) throw error;
 
-            renderVlogs(data);
-        }
+            resultDiv.innerHTML = `<p class="text-green-600">✅ Successfully saved: <strong>${parsed.title}</strong></p>`;
+            // Refresh matched opportunities
+            loadMatchedOpportunities();
+          } catch (err) {
+            console.error(err);
+            resultDiv.innerHTML = `<p class="text-red-600">❌ Error: ${err.message}</p>`;
+          }
+        });
+        return;
+      }
 
-        function renderVlogs(vlogs) {
-            vlogGrid.innerHTML = '';
-            
-            if (!vlogs || vlogs.length === 0) {
-                noVlogsEl.classList.remove('hidden');
-                return;
-            } else {
-                noVlogsEl.classList.add('hidden');
-            }
+      // For schemes, scholarships, jobs
+      const type = tab === 'schemes' ? 'scheme' : tab === 'scholarships' ? 'scholarship' : 'job';
+      const { data: profile } = await supabaseClient
+        .from('Users')
+        .select('*')
+        .eq('id', currentUser.id)
+        .maybeSingle();
 
-            vlogs.forEach((vlog) => {
-                const isMyVlog = currentUser && currentUser.email === vlog.author_email;
-                const isPrivate = !vlog.is_public;
-                
-                const card = document.createElement('article');
-                card.className = `bg-slate-900 border ${isMyVlog ? 'border-cyan-500/50' : 'border-slate-800'} rounded-2xl overflow-hidden shadow-lg hover:border-slate-700 transition-all p-6 space-y-3 relative`;
-                
-                // প্রাইভেট ভ্লগের জন্য লক আইকন
-                const lockIcon = isPrivate ? `<span class="absolute top-6 right-6 text-red-400" title="Private Vlog">🔒</span>` : '';
+      const items = filterOpportunities(profile, type);
 
-                card.innerHTML = `
-                    ${lockIcon}
-                    <div class="flex justify-between items-start pr-6">
-                        <span class="text-xs px-3 py-1 ${isPrivate ? 'bg-red-950 text-red-400' : 'bg-cyan-950 text-cyan-400'} rounded-full font-medium">
-                            ${isMyVlog ? '✨ My Vlog' : 'Community Vlog'} ${isPrivate ? '(Private)' : ''}
-                        </span>
-                        <span class="text-[10px] text-slate-500 mt-1">By: ${vlog.author_email.split('@')[0]}</span>
-                    </div>
-                    <h3 class="text-xl font-bold text-white">${vlog.title}</h3>
-                    <p class="text-slate-400 text-sm">${vlog.description}</p>
-                `;
-                vlogGrid.appendChild(card);
-            });
-        }
+      if (items.length === 0) {
+        container.innerHTML = '<p class="text-gray-500 text-center py-8">No items found for this category.</p>';
+        return;
+      }
 
-        async function handleVlogSubmit(e) {
-            e.preventDefault();
-            if (!currentUser) {
-                alert('Please login first to upload a vlog!');
-                return;
-            }
+      items.forEach(opp => {
+        const card = document.createElement('div');
+        card.className = 'glass card-hover rounded-xl p-4 shadow-lg';
+        card.innerHTML = `
+          <h4 class="font-bold text-gray-800">${opp.title}</h4>
+          <p class="text-sm text-gray-600 mt-1">${opp.description}</p>
+          <div class="mt-3 flex flex-wrap gap-2 text-xs text-gray-500">
+            ${opp.state !== 'All' ? `<span>📍 ${opp.state}</span>` : ''}
+            ${opp.caste !== 'All' ? `<span>👥 ${opp.caste}</span>` : ''}
+            ${opp.age_min != null ? `<span>🎂 ${opp.age_min}-${opp.age_max} yrs</span>` : ''}
+            ${opp.percentage_required != null ? `<span>📊 ≥${opp.percentage_required}%</span>` : ''}
+            ${opp.benefits ? `<span>🎁 ${opp.benefits}</span>` : ''}
+            ${opp.cutoff_previous_year ? `<span>📈 Cutoff: ${opp.cutoff_previous_year}</span>` : ''}
+          </div>
+          <a href="${opp.official_link}" target="_blank" class="mt-3 inline-block bg-indigo-600 hover:bg-indigo-700 text-white text-sm px-4 py-1.5 rounded-lg transition">Official Link</a>
+        `;
+        container.appendChild(card);
+      });
+    }
 
-            const title = document.getElementById('vlog-title').value;
-            const desc = document.getElementById('vlog-desc').value;
-            const isPublic = document.getElementById('vlog-public').checked;
-            const submitBtn = document.getElementById('submit-btn');
+    // ============================================================
+    // 6. GEMINI AI HANDLERS
+    // ============================================================
 
-            submitBtn.textContent = 'Publishing...';
-            submitBtn.disabled = true;
+    // User AI Assistant
+    async function callGeminiUser(prompt) {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_KEY_USER}`;
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }],
+        }),
+      });
+      if (!res.ok) throw new Error(`Gemini API error: ${res.status}`);
+      const data = await res.json();
+      return data.candidates?.[0]?.content?.parts?.[0]?.text ?? 'No response.';
+    }
 
-            const newVlog = {
-                title: title,
-                description: desc,
-                author_email: currentUser.email,
-                author_id: currentUser.id,
-                is_public: isPublic
-            };
+    // Admin AI Parser
+    async function callGeminiAdmin(text) {
+      const prompt = `You are an AI that extracts structured JSON from unstructured Indian government scheme/job/scholarship text.
+Return ONLY valid JSON with these fields: type ("scheme"|"scholarship"|"job"), title, description, state (or "All"), caste (or "All"), age_min (number or null), age_max (number or null), percentage_required (number or null), official_link, benefits, cutoff_previous_year.
+Do not include markdown or extra text.
+Text: "${text}"`;
 
-            // Supabase ডাটাবেসে সেভ করা
-            const { error } = await _supabase.from('vlogs').insert([newVlog]);
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_KEY_ADMIN}`;
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }],
+        }),
+      });
+      if (!res.ok) throw new Error(`Gemini Admin API error: ${res.status}`);
+      const data = await res.json();
+      const raw = data.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
+      // Clean and parse JSON
+      const clean = raw.replace(/```json|```/g, '').trim();
+      return JSON.parse(clean);
+    }
 
-            if (error) {
-                alert('Failed to publish vlog: ' + error.message);
-                console.error(error);
-            } else {
-                document.getElementById('vlog-form').reset();
-                await fetchVlogs(); // নতুন ভ্লগ লোড করা
-            }
+    // ============================================================
+    // 7. FLOATING AI ASSISTANT UI
+    // ============================================================
+    const aiChatWindow = document.getElementById('aiChatWindow');
+    const aiChatMessages = document.getElementById('aiChatMessages');
 
-            submitBtn.textContent = 'Publish Vlog';
-            submitBtn.disabled = false;
-        }
+    document.getElementById('aiAvatarBtn').addEventListener('click', () => {
+      aiChatWindow.classList.toggle('hidden');
+      if (!aiChatWindow.classList.contains('hidden') && aiChatMessages.children.length === 0) {
+        addAiMessage('bot', 'Hello! I can help you check eligibility for schemes, scholarships, and jobs. What would you like to know?');
+      }
+    });
 
-        async function handleGoogleLogin() {
-            clearError();
-            const { error } = await _supabase.auth.signInWithOAuth({
-                provider: 'google',
-                options: {
-                    redirectTo: window.location.origin
-                }
-            });
-            if (error) showError(error.message);
-        }
+    document.getElementById('closeAiChat').addEventListener('click', () => {
+      aiChatWindow.classList.add('hidden');
+    });
 
-        async function handleLogout() {
-            await _supabase.auth.signOut();
-            window.location.href = window.location.origin;
-        }
+    document.getElementById('aiSendBtn').addEventListener('click', sendAiMessage);
+    document.getElementById('aiChatInput').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') sendAiMessage();
+    });
 
-        function showError(msg) {
-            errorMsgEl.textContent = msg;
-            errorMsgEl.classList.remove('hidden');
-        }
+    async function sendAiMessage() {
+      const input = document.getElementById('aiChatInput');
+      const text = input.value.trim();
+      if (!text) return;
+      input.value = '';
+      addAiMessage('user', text);
+      addAiMessage('bot', 'Thinking...');
 
-        function clearError() {
-            errorMsgEl.textContent = '';
-            errorMsgEl.classList.add('hidden');
-        }
+      try {
+        const response = await callGeminiUser(text);
+        // Remove "Thinking..." message
+        aiChatMessages.lastElementChild.remove();
+        addAiMessage('bot', response);
+      } catch (err) {
+        aiChatMessages.lastElementChild.remove();
+        addAiMessage('bot', '⚠️ Error: ' + err.message);
+      }
+    }
 
-        window.onload = initApp;
-    </script>
+    function addAiMessage(sender, text) {
+      const div = document.createElement('div');
+      div.className = sender === 'user' ? 'text-right' : 'text-left';
+      div.innerHTML = `
+        <span class="inline-block px-3 py-2 rounded-lg text-sm ${sender === 'user' ? 'bg-indigo-600 text-white' : 'bg-gray-700 text-white'}">
+          ${text}
+        </span>
+      `;
+      aiChatMessages.appendChild(div);
+      aiChatMessages.scrollTop = aiChatMessages.scrollHeight;
+    }
+
+    // ============================================================
+    // 8. EVENT LISTENERS FOR AUTH BUTTONS
+    // ============================================================
+    document.getElementById('googleSignInBtn').addEventListener('click', signInWithGoogle);
+    document.getElementById('welcomeSignInBtn').addEventListener('click', signInWithGoogle);
+    document.getElementById('signOutBtn').addEventListener('click', signOut);
+
+    // Apply saved language on load
+    applyLanguage(currentLang);
+    document.getElementById('languageSwitcher').value = currentLang;
+  </script>
 </body>
 </html>
