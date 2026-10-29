@@ -63,7 +63,16 @@
                     <label class="block text-xs text-slate-400 mb-1">Vlog Content / Description</label>
                     <textarea id="vlog-desc" rows="3" required placeholder="Write your thoughts..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-500"></textarea>
                 </div>
-                <button type="submit" class="bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-semibold px-6 py-2.5 rounded-xl text-xs transition-all cursor-pointer">Publish Vlog</button>
+                
+                <!-- Public/Private Toggle -->
+                <div class="flex items-center gap-2 bg-slate-950 p-3 rounded-xl border border-slate-800">
+                    <input type="checkbox" id="vlog-public" checked class="w-4 h-4 accent-cyan-500 cursor-pointer">
+                    <label for="vlog-public" class="text-xs text-slate-300 cursor-pointer select-none">
+                        Make this vlog <strong>Public</strong> (Anyone can see this). Uncheck to keep it Private.
+                    </label>
+                </div>
+
+                <button type="submit" id="submit-btn" class="bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-semibold px-6 py-2.5 rounded-xl text-xs transition-all cursor-pointer">Publish Vlog</button>
             </form>
         </section>
 
@@ -73,6 +82,7 @@
             <div id="vlog-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <!-- Vlogs will be injected here dynamically -->
             </div>
+            <div id="no-vlogs" class="hidden text-center text-slate-500 py-8">No vlogs found. Be the first to post!</div>
         </section>
 
     </main>
@@ -84,7 +94,6 @@
 
     <!-- Script Logic -->
     <script>
-        // তোর আসল Supabase Project URL এবং Publishable Key
         const SUPABASE_URL = 'https://kzbhpwtcsowzivgpellr.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_RUO7ScIOI8q5r8_iH5udVA_WmbrdwLf'; 
 
@@ -93,7 +102,7 @@
             auth: {
                 persistSession: true,
                 autoRefreshToken: true,
-                detectSessionInUrl: true // Supabase নিজেই URL থেকে টোকেন ধরবে (লগইন লুপ ফিক্স)
+                detectSessionInUrl: true
             }
         });
 
@@ -103,37 +112,27 @@
         const navAuth = document.getElementById('nav-auth');
         const errorMsgEl = document.getElementById('error-msg');
         const vlogGrid = document.getElementById('vlog-grid');
+        const noVlogsEl = document.getElementById('no-vlogs');
 
         let currentUser = null;
 
-        let vlogs = JSON.parse(localStorage.getItem('sagar_vlogs')) || [
-            { title: 'Coding Sessions & Late Night Debugging', desc: 'How we survive data structures, algorithms, and project deadlines at college hostel rooms.', author: 'Sagar Biswas' },
-            { title: 'Finding Peace with Hindustani Classical Flute', desc: 'A quick glimpse into my daily bansuri practice sessions after long hours of full-stack web dev.', author: 'Sagar Biswas' }
-        ];
-
         async function initApp() {
-            // সেশন চেক করা
             const { data: { session }, error } = await _supabase.auth.getSession();
-            
-            if (error) console.error("Session Error:", error);
-
             currentUser = session ? session.user : null;
+            
             updateUI(session);
-            renderVlogs();
+            await fetchVlogs(); // ডাটাবেস থেকে ভ্লগ আনা
 
-            // অথেনটিকেশন স্টেট চেঞ্জ লিসেনার
-            _supabase.auth.onAuthStateChange((event, session) => {
-                console.log("Auth Event:", event);
+            _supabase.auth.onAuthStateChange(async (event, session) => {
                 currentUser = session ? session.user : null;
                 updateUI(session);
-                renderVlogs();
+                await fetchVlogs(); // লগইন/লগআউট হলে ভ্লগ রিফ্রেশ হবে
             });
         }
 
         function updateUI(session) {
             loadingEl.classList.add('hidden');
             if (session) {
-                // লগইন করা থাকলে
                 authSection.classList.add('hidden');
                 uploadSection.classList.remove('hidden');
                 navAuth.innerHTML = `
@@ -143,7 +142,6 @@
                     </div>
                 `;
             } else {
-                // লগআউট থাকলে
                 authSection.classList.remove('hidden');
                 uploadSection.classList.add('hidden');
                 navAuth.innerHTML = `
@@ -152,25 +150,58 @@
             }
         }
 
-        function renderVlogs() {
+        // ডাটাবেস থেকে ভ্লগ নিয়ে আসা
+        async function fetchVlogs() {
+            // RLS পলিসি অনুযায়ী ডাটা ফিল্টার হয়ে আসবে (পাবলিক + নিজের প্রাইভেট)
+            const { data, error } = await _supabase
+                .from('vlogs')
+                .select('*')
+                .order('created_at', { ascending: false });
+
+            if (error) {
+                console.error('Error fetching vlogs:', error);
+                return;
+            }
+
+            renderVlogs(data);
+        }
+
+        function renderVlogs(vlogs) {
             vlogGrid.innerHTML = '';
+            
+            if (!vlogs || vlogs.length === 0) {
+                noVlogsEl.classList.remove('hidden');
+                return;
+            } else {
+                noVlogsEl.classList.add('hidden');
+            }
+
             vlogs.forEach((vlog) => {
-                const isMyVlog = currentUser && currentUser.email === vlog.author;
+                const isMyVlog = currentUser && currentUser.email === vlog.author_email;
+                const isPrivate = !vlog.is_public;
+                
                 const card = document.createElement('article');
-                card.className = `bg-slate-900 border ${isMyVlog ? 'border-cyan-500/50' : 'border-slate-800'} rounded-2xl overflow-hidden shadow-lg hover:border-slate-700 transition-all p-6 space-y-3`;
+                card.className = `bg-slate-900 border ${isMyVlog ? 'border-cyan-500/50' : 'border-slate-800'} rounded-2xl overflow-hidden shadow-lg hover:border-slate-700 transition-all p-6 space-y-3 relative`;
+                
+                // প্রাইভেট ভ্লগের জন্য লক আইকন
+                const lockIcon = isPrivate ? `<span class="absolute top-6 right-6 text-red-400" title="Private Vlog">🔒</span>` : '';
+
                 card.innerHTML = `
-                    <div class="flex justify-between items-start">
-                        <span class="text-xs px-3 py-1 bg-cyan-950 text-cyan-400 rounded-full font-medium">${isMyVlog ? '✨ My Vlog' : 'Community Vlog'}</span>
-                        <span class="text-[10px] text-slate-500">By: ${vlog.author}</span>
+                    ${lockIcon}
+                    <div class="flex justify-between items-start pr-6">
+                        <span class="text-xs px-3 py-1 ${isPrivate ? 'bg-red-950 text-red-400' : 'bg-cyan-950 text-cyan-400'} rounded-full font-medium">
+                            ${isMyVlog ? '✨ My Vlog' : 'Community Vlog'} ${isPrivate ? '(Private)' : ''}
+                        </span>
+                        <span class="text-[10px] text-slate-500 mt-1">By: ${vlog.author_email.split('@')[0]}</span>
                     </div>
                     <h3 class="text-xl font-bold text-white">${vlog.title}</h3>
-                    <p class="text-slate-400 text-sm">${vlog.desc}</p>
+                    <p class="text-slate-400 text-sm">${vlog.description}</p>
                 `;
                 vlogGrid.appendChild(card);
             });
         }
 
-        function handleVlogSubmit(e) {
+        async function handleVlogSubmit(e) {
             e.preventDefault();
             if (!currentUser) {
                 alert('Please login first to upload a vlog!');
@@ -179,19 +210,33 @@
 
             const title = document.getElementById('vlog-title').value;
             const desc = document.getElementById('vlog-desc').value;
+            const isPublic = document.getElementById('vlog-public').checked;
+            const submitBtn = document.getElementById('submit-btn');
+
+            submitBtn.textContent = 'Publishing...';
+            submitBtn.disabled = true;
 
             const newVlog = {
                 title: title,
-                desc: desc,
-                author: currentUser.email
+                description: desc,
+                author_email: currentUser.email,
+                author_id: currentUser.id,
+                is_public: isPublic
             };
 
-            vlogs.unshift(newVlog);
-            localStorage.setItem('sagar_vlogs', JSON.stringify(vlogs));
+            // Supabase ডাটাবেসে সেভ করা
+            const { error } = await _supabase.from('vlogs').insert([newVlog]);
 
-            document.getElementById('vlog-form').reset();
-            renderVlogs();
-            alert('Vlog published successfully!');
+            if (error) {
+                alert('Failed to publish vlog: ' + error.message);
+                console.error(error);
+            } else {
+                document.getElementById('vlog-form').reset();
+                await fetchVlogs(); // নতুন ভ্লগ লোড করা
+            }
+
+            submitBtn.textContent = 'Publish Vlog';
+            submitBtn.disabled = false;
         }
 
         async function handleGoogleLogin() {
@@ -199,7 +244,7 @@
             const { error } = await _supabase.auth.signInWithOAuth({
                 provider: 'google',
                 options: {
-                    redirectTo: window.location.origin + window.location.pathname
+                    redirectTo: window.location.origin
                 }
             });
             if (error) showError(error.message);
@@ -207,7 +252,7 @@
 
         async function handleLogout() {
             await _supabase.auth.signOut();
-            window.location.href = window.location.origin + window.location.pathname;
+            window.location.href = window.location.origin;
         }
 
         function showError(msg) {
