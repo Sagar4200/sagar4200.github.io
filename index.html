@@ -3,35 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ex3 - Secure Google Auth Portal</title>
+    <title>Sagar's Vlog & Tech Space</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Supabase JS Library -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex items-center justify-center p-4">
+<body class="bg-slate-950 text-slate-100 min-h-screen font-sans">
 
-    <div class="w-full max-w-md bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl">
-        <!-- Header -->
-        <div class="text-center mb-6">
-            <h1 class="text-2xl font-bold tracking-wide text-cyan-400">Ex3 Project Portal</h1>
-            <p class="text-xs text-slate-400 mt-1">One-click secure login with Google</p>
+    <!-- Navigation Bar -->
+    <nav class="border-b border-slate-800 bg-slate-900/50 backdrop-blur sticky top-0 z-50 px-6 py-4 flex justify-between items-center">
+        <h1 class="text-xl font-bold tracking-wider text-cyan-400">Sagar's Vlog</h1>
+        <div id="nav-auth" class="flex items-center gap-4">
+            <!-- Dynamic Auth Button / User Info -->
         </div>
+    </nav>
+
+    <!-- Main Container -->
+    <main class="max-w-4xl mx-auto px-4 py-8 space-y-12">
+
+        <!-- Hero Section -->
+        <header class="text-center space-y-4 py-8 bg-gradient-to-r from-cyan-950/40 to-slate-900 border border-slate-800 rounded-3xl p-8 shadow-2xl">
+            <h2 class="text-3xl md:text-5xl font-extrabold text-white">Welcome to My Digital Diary & Tech Blog</h2>
+            <p class="text-slate-400 text-sm md:text-base max-w-xl mx-auto">Exploring B.Tech CSE life, full-stack web development, bansuri melodies, and retro gaming adventures.</p>
+        </header>
 
         <!-- Loading State -->
-        <div id="loading" class="text-center py-6 text-slate-400">
-            Checking session...
+        <div id="loading" class="text-center py-12 text-slate-400 animate-pulse">
+            Loading your experience...
         </div>
 
-        <!-- Login Container (Shown when logged out) -->
-        <div id="auth-container" class="hidden space-y-4 text-center">
-            <div class="p-4 bg-slate-800/40 border border-slate-800 rounded-xl text-xs text-slate-300">
-                No passwords needed! Click below to securely sign in using your Google account.
+        <!-- Login Card (Hidden if logged in) -->
+        <section id="auth-section" class="hidden max-w-md mx-auto bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl text-center space-y-6">
+            <div>
+                <h3 class="text-lg font-bold text-slate-200">Join the Community</h3>
+                <p class="text-xs text-slate-400 mt-1">Sign in securely with your Google account to interact with vlogs.</p>
             </div>
-
             <div id="error-msg" class="text-red-400 text-xs hidden"></div>
-            
-            <!-- Google Sign-In Button -->
             <button onclick="handleGoogleLogin()" class="w-full flex items-center justify-center gap-3 bg-white hover:bg-slate-100 text-slate-900 font-semibold py-3 rounded-xl text-sm transition-all shadow-lg cursor-pointer">
                 <svg class="w-5 h-5" viewBox="0 0 24 24">
                     <path fill="#4285F4" d="M23.745 12.27c-.07-.8-.64-1.54-1.44-1.77H12v4.51h6.61c-.29 1.54-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.65-5.17 3.65-8.82z"/>
@@ -41,71 +49,99 @@
                 </svg>
                 Continue with Google
             </button>
-        </div>
+        </section>
 
-        <!-- Dashboard View (Shown when logged in) -->
-        <div id="dashboard-container" class="hidden space-y-6 text-center">
-            <div class="p-4 bg-slate-800/50 border border-slate-800 rounded-xl">
-                <p class="text-xs text-slate-400">Logged in Google Account:</p>
-                <p id="user-email" class="text-sm font-medium text-cyan-300 mt-1 break-all"></p>
-            </div>
-            
-            <div class="p-4 bg-emerald-950/20 border border-emerald-900/40 rounded-xl text-emerald-400 text-xs">
-                ✅ Session is active. You are successfully logged in via Supabase cloud auth!
-            </div>
+        <!-- Vlog Feed Grid -->
+        <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Vlog Card 1 -->
+            <article class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-lg hover:border-slate-700 transition-all">
+                <div class="h-48 bg-gradient-to-tr from-cyan-900/40 to-indigo-900/40 flex items-center justify-center text-cyan-300 font-bold text-lg">
+                    🎥 B.Tech CSE Lab Vlog
+                </div>
+                <div class="p-6 space-y-3">
+                    <span class="text-xs px-3 py-1 bg-cyan-950 text-cyan-400 rounded-full font-medium">College Life</span>
+                    <h3 class="text-xl font-bold text-white">Coding Sessions & Late Night Debugging</h3>
+                    <p class="text-slate-400 text-sm">How we survive data structures, algorithms, and project deadlines at college hostel rooms.</p>
+                </div>
+            </article>
 
-            <button onclick="handleLogout()" class="w-full bg-red-600/20 hover:bg-red-600/30 text-red-400 border border-red-900/50 font-semibold py-2.5 rounded-xl text-sm transition-all cursor-pointer">
-                Logout
-            </button>
-        </div>
-    </div>
+            <!-- Vlog Card 2 -->
+            <article class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-lg hover:border-slate-700 transition-all">
+                <div class="h-48 bg-gradient-to-tr from-purple-900/40 to-pink-900/40 flex items-center justify-center text-pink-300 font-bold text-lg">
+                    🎶 Bansuri & Music Notes
+                </div>
+                <div class="p-6 space-y-3">
+                    <span class="text-xs px-3 py-1 bg-purple-950 text-pink-400 rounded-full font-medium">Hobbies</span>
+                    <h3 class="text-xl font-bold text-white">Finding Peace with Hindustani Classical Flute</h3>
+                    <p class="text-slate-400 text-sm">A quick glimpse into my daily bansuri practice sessions after long hours of full-stack web dev.</p>
+                </div>
+            </article>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="text-center py-8 text-slate-500 text-xs border-t border-slate-900 mt-16">
+        © 2026 Sagar Biswas. Built with HTML, Tailwind & Supabase.
+    </footer>
 
     <!-- Script Logic -->
     <script>
-        // Supabase Config for Ex3 Project
         const SUPABASE_URL = 'https://kzbhpwtcsowzivgpellr.supabase.co';
-        const SUPABASE_ANON_KEY = 'TOR_SUPABASE_PUBLISHABLE_KEY_EKHANE_BOSABI'; // Tor publishable key ekhane bosabi
+        const SUPABASE_ANON_KEY = 'TOR_SUPABASE_PUBLISHABLE_KEY_EKHANE_BOSABI'; // Tor key ekhane bosabi
 
         const { createClient } = supabase;
         const _supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         const loadingEl = document.getElementById('loading');
-        const authContainer = document.getElementById('auth-container');
-        const dashboardContainer = document.getElementById('dashboard-container');
-        const userEmailEl = document.getElementById('user-email');
+        const authSection = document.getElementById('auth-section');
+        const navAuth = document.getElementById('nav-auth');
         const errorMsgEl = document.getElementById('error-msg');
 
-        // Check active session on load
-        async function checkSession() {
+        async function initApp() {
+            // Handle hash tokens automatically returned by Supabase OAuth
+            if (window.location.hash && window.location.hash.includes('access_token')) {
+                const { data, error } = await _supabase.auth.getSession();
+                if (data.session) {
+                    window.location.hash = ''; // Clear hash from URL
+                }
+            }
+
             const { data: { session } } = await _supabase.auth.getSession();
-            manageView(session);
+            updateUI(session);
 
             _supabase.auth.onAuthStateChange((event, session) => {
-                manageView(session);
+                updateUI(session);
             });
         }
 
-        function manageView(session) {
+        function updateUI(session) {
             loadingEl.classList.add('hidden');
             if (session) {
-                authContainer.classList.add('hidden');
-                dashboardContainer.classList.remove('hidden');
-                userEmailEl.textContent = session.user.email;
+                authSection.classList.add('hidden');
+                navAuth.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <span class="text-xs text-cyan-300 hidden md:inline">${session.user.email}</span>
+                        <button onclick="handleLogout()" class="bg-red-600/20 hover:bg-red-600/30 text-red-400 border border-red-900/50 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer">Logout</button>
+                    </div>
+                `;
             } else {
-                dashboardContainer.classList.add('hidden');
-                authContainer.classList.remove('hidden');
+                authSection.classList.remove('hidden');
+                navAuth.innerHTML = `
+                    <button onclick="document.getElementById('auth-section').scrollIntoView({behavior: 'smooth'})" class="bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-semibold px-4 py-2 rounded-xl text-xs transition-all cursor-pointer">Sign In</button>
+                `;
             }
         }
 
-        // Trigger Google OAuth Sign-in
         async function handleGoogleLogin() {
             clearError();
-            const { data, error } = await _supabase.auth.signInWithOAuth({
-                provider: 'google'
+            const { error } = await _supabase.auth.signInWithOAuth({
+                provider: 'google',
+                options: {
+                    redirectTo: window.location.origin + window.location.pathname
+                }
             });
-            if (error) {
-                showError(error.message);
-            }
+            if (error) showError(error.message);
         }
 
         async function handleLogout() {
@@ -122,7 +158,7 @@
             errorMsgEl.classList.add('hidden');
         }
 
-        window.onload = checkSession;
+        window.onload = initApp;
     </script>
 </body>
 </html>
