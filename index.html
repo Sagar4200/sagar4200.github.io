@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Career & Scheme Navigator — India</title>
-  <meta name="description" content="Find government schemes, scholarships, and jobs tailored to your profile. Built for Indian students and job seekers." />
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -12,8 +11,7 @@
         extend: {
           colors: {
             brand: { 50:'#eef2ff',100:'#e0e7ff',200:'#c7d2fe',300:'#a5b4fc',400:'#818cf8',500:'#6366f1',600:'#4f46e5',700:'#4338ca',800:'#3730a3',900:'#312e81' },
-            saffron: { 400:'#fb923c',500:'#f97316',600:'#ea580c' },
-            india: { green:'#138808', saffron:'#FF9933' }
+            saffron: { 400:'#fb923c',500:'#f97316',600:'#ea580c' }
           },
           fontFamily: { sans: ['Inter','system-ui','sans-serif'] },
           animation: { 'fade-in':'fadeIn .3s ease-out', 'slide-up':'slideUp .3s ease-out' },
@@ -25,53 +23,42 @@
       }
     }
   </script>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
   <style>
-    .glass { background: rgba(255,255,255,.75); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border: 1px solid rgba(255,255,255,.4); }
+    .glass { background: rgba(255,255,255,.75); backdrop-filter: blur(14px); border: 1px solid rgba(255,255,255,.4); }
     .glass-dark { background: rgba(15,23,42,.85); backdrop-filter: blur(14px); border: 1px solid rgba(255,255,255,.08); }
     .no-scrollbar::-webkit-scrollbar { display: none; }
-    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     .card-hover { transition: transform .2s ease, box-shadow .2s ease; }
     .card-hover:hover { transform: translateY(-3px); box-shadow: 0 20px 40px -15px rgba(0,0,0,.15); }
     .line-clamp-2 { display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
-    .line-clamp-3 { display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; }
     #assistant-btn { touch-action: none; }
   </style>
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen">
 
-  <!-- ================= LOADER ================= -->
+  <!-- LOADER -->
   <div id="global-loader" class="fixed inset-0 z-[100] flex items-center justify-center bg-white/80 backdrop-blur-sm hidden">
-    <div class="flex flex-col items-center gap-4">
-      <div class="w-12 h-12 border-4 border-brand-200 border-t-brand-600 rounded-full animate-spin"></div>
-      <p class="text-sm font-medium text-slate-500">Loading…</p>
-    </div>
+    <div class="w-12 h-12 border-4 border-brand-200 border-t-brand-600 rounded-full animate-spin"></div>
   </div>
 
-  <!-- ================= TOAST CONTAINER ================= -->
+  <!-- TOASTS -->
   <div id="toast-container" class="fixed top-4 right-4 z-[110] flex flex-col gap-2 w-[calc(100%-2rem)] max-w-sm"></div>
 
-  <!-- ================= APP SHELL ================= -->
   <div class="flex min-h-screen">
-
-    <!-- ---------- SIDEBAR (DESKTOP) ---------- -->
-    <aside id="sidebar" class="hidden lg:flex flex-col w-64 bg-white border-r border-slate-200 fixed inset-y-0 left-0 z-40">
+    <!-- SIDEBAR (DESKTOP) -->
+    <aside class="hidden lg:flex flex-col w-64 bg-white border-r border-slate-200 fixed inset-y-0 left-0 z-40">
       <div class="p-6 flex items-center gap-3 border-b border-slate-100">
         <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-600 to-saffron-500 flex items-center justify-center text-white font-bold text-lg">CS</div>
-        <div>
-          <h1 class="font-bold text-slate-900 leading-tight">Career & Scheme</h1>
-          <p class="text-xs text-slate-400 font-medium">Navigator · India</p>
-        </div>
+        <div><h1 class="font-bold text-slate-900 leading-tight">Career & Scheme</h1><p class="text-xs text-slate-400 font-medium">Navigator · India</p></div>
       </div>
       <nav class="flex-1 p-4 space-y-1 overflow-y-auto no-scrollbar">
-        <a href="#home" class="nav-link flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-600 hover:bg-brand-50 hover:text-brand-700 transition"><span class="text-lg">🏠</span> Home</a>
-        <a href="#scholarships" class="nav-link flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-600 hover:bg-brand-50 hover:text-brand-700 transition"><span class="text-lg">🎓</span> Scholarships</a>
-        <a href="#schemes" class="nav-link flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-600 hover:bg-brand-50 hover:text-brand-700 transition"><span class="text-lg">🏛️</span> Schemes</a>
-        <a href="#jobs" class="nav-link flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-600 hover:bg-brand-50 hover:text-brand-700 transition"><span class="text-lg">💼</span> Govt Jobs</a>
-        <a href="#preparation" class="nav-link flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-600 hover:bg-brand-50 hover:text-brand-700 transition"><span class="text-lg">📚</span> Preparation Hub</a>
-        <a href="#profile" class="nav-link flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-600 hover:bg-brand-50 hover:text-brand-700 transition"><span class="text-lg">👤</span> My Profile</a>
-        <a href="#admin" id="nav-admin" class="nav-link hidden items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-600 hover:bg-brand-50 hover:text-brand-700 transition"><span class="text-lg">⚙️</span> Admin Panel</a>
+        <a href="#home" class="nav-link flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-600 hover:bg-brand-50 hover:text-brand-700"><span class="text-lg">🏠</span> Home</a>
+        <a href="#scholarships" class="nav-link flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-600 hover:bg-brand-50 hover:text-brand-700"><span class="text-lg">🎓</span> Scholarships</a>
+        <a href="#schemes" class="nav-link flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-600 hover:bg-brand-50 hover:text-brand-700"><span class="text-lg">🏛️</span> Schemes</a>
+        <a href="#jobs" class="nav-link flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-600 hover:bg-brand-50 hover:text-brand-700"><span class="text-lg">💼</span> Govt Jobs</a>
+        <a href="#preparation" class="nav-link flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-600 hover:bg-brand-50 hover:text-brand-700"><span class="text-lg">📚</span> Preparation</a>
+        <a href="#profile" class="nav-link flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-600 hover:bg-brand-50 hover:text-brand-700"><span class="text-lg">👤</span> My Profile</a>
+        <a href="#admin" id="nav-admin" class="nav-link hidden items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-red-600 hover:bg-red-50 transition"><span class="text-lg">⚙️</span> Admin Panel</a>
       </nav>
       <div id="sidebar-user" class="p-4 border-t border-slate-100 hidden">
         <div class="flex items-center gap-3">
@@ -84,22 +71,23 @@
       </div>
     </aside>
 
-    <!-- ---------- MAIN AREA ---------- -->
+    <!-- MAIN AREA -->
     <div class="flex-1 lg:ml-64 flex flex-col min-h-screen">
-
-      <!-- TOP BAR (MOBILE + DESKTOP) -->
+      <!-- TOP BAR -->
       <header class="sticky top-0 z-30 glass border-b border-slate-200/60">
         <div class="flex items-center justify-between px-4 sm:px-6 py-3">
           <div class="flex items-center gap-3 lg:hidden">
             <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-brand-600 to-saffron-500 flex items-center justify-center text-white font-bold text-sm">CS</div>
             <h1 class="font-bold text-slate-900">Career & Scheme</h1>
           </div>
-          <div class="hidden lg:block">
-            <p class="text-sm font-medium text-slate-500">Welcome back 👋</p>
-          </div>
-          <div class="flex items-center gap-3">
+          <div class="hidden lg:block text-sm font-medium text-slate-500">Welcome back 👋</div>
+          <div class="flex items-center gap-2">
+            <!-- Admin Login Button -->
+            <button id="btn-admin-login" class="hidden sm:inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-800 border border-slate-700 hover:bg-slate-900 text-sm font-semibold text-white transition shadow-sm">
+              🔐 Admin Login
+            </button>
+            
             <button id="btn-signin-top" class="hidden sm:inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white border border-slate-200 hover:border-brand-300 text-sm font-semibold text-slate-700 transition shadow-sm">
-              <svg class="w-4 h-4" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.27-4.74 3.27-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84A11 11 0 0 0 12 23z"/><path fill="#FBBC05" d="M5.84 14.09A6.6 6.6 0 0 1 5.5 12c0-.73.13-1.43.34-2.09V7.07H2.18A11 11 0 0 0 1 12c0 1.78.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84C6.71 7.31 9.14 5.38 12 5.38z"/></svg>
               Sign in with Google
             </button>
             <button id="btn-signin-mobile" class="sm:hidden p-2 rounded-xl bg-white border border-slate-200 text-sm font-semibold">Sign in</button>
@@ -108,237 +96,131 @@
         </div>
       </header>
 
-      <!-- ================= MAIN CONTENT ================= -->
-      <main id="app-main" class="flex-1 p-4 sm:p-6 lg:p-8 pb-24 lg:pb-8">
-
-        <!-- ---------- VIEW: HOME ---------- -->
+      <!-- MAIN CONTENT -->
+      <main class="flex-1 p-4 sm:p-6 lg:p-8 pb-24 lg:pb-8">
+        
+        <!-- HOME VIEW -->
         <section id="view-home" class="view hidden animate-fade-in">
           <div class="rounded-3xl bg-gradient-to-br from-brand-700 via-brand-600 to-saffron-500 p-6 sm:p-10 text-white relative overflow-hidden">
-            <div class="absolute -right-10 -top-10 w-64 h-64 bg-white/10 rounded-full blur-2xl"></div>
             <div class="relative z-10">
-              <p class="text-sm font-semibold text-white/80 uppercase tracking-wider mb-2">For Every Indian Student</p>
-              <h2 class="text-3xl sm:text-4xl font-extrabold leading-tight mb-3">Your Career. Your Scheme.<br/>One Navigator.</h2>
-              <p class="text-white/80 max-w-xl mb-6">Discover government schemes, scholarships, and jobs filtered by your state, caste, gender, and education.</p>
-              <div class="flex flex-wrap gap-3">
-                <button data-nav="#scholarships" class="px-5 py-2.5 rounded-xl bg-white text-brand-700 font-semibold text-sm hover:bg-brand-50 transition">Explore Scholarships</button>
-                <button data-nav="#jobs" class="px-5 py-2.5 rounded-xl bg-white/15 border border-white/30 text-white font-semibold text-sm hover:bg-white/25 transition">Browse Govt Jobs</button>
+              <h2 class="text-3xl font-extrabold mb-3">Your Career. Your Scheme.<br/>One Navigator.</h2>
+              <p class="text-white/80 max-w-xl mb-6">Discover schemes, scholarships, and jobs filtered by your state, caste, gender, and education.</p>
+              <div class="flex gap-3">
+                <button data-nav="#scholarships" class="px-5 py-2.5 rounded-xl bg-white text-brand-700 font-semibold text-sm">Explore Scholarships</button>
+                <button data-nav="#jobs" class="px-5 py-2.5 rounded-xl bg-white/15 border border-white/30 text-white font-semibold text-sm">Browse Jobs</button>
               </div>
             </div>
           </div>
-
-          <!-- QUICK STATS -->
-          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-6">
-            <div class="glass rounded-2xl p-4 card-hover"><p class="text-2xl font-bold text-brand-700" id="stat-schemes">—</p><p class="text-xs text-slate-500 mt-1">Schemes & Scholarships</p></div>
-            <div class="glass rounded-2xl p-4 card-hover"><p class="text-2xl font-bold text-brand-700" id="stat-jobs">—</p><p class="text-xs text-slate-500 mt-1">Govt Job Openings</p></div>
-            <div class="glass rounded-2xl p-4 card-hover"><p class="text-2xl font-bold text-brand-700">28+</p><p class="text-xs text-slate-500 mt-1">States Covered</p></div>
-            <div class="glass rounded-2xl p-4 card-hover"><p class="text-2xl font-bold text-brand-700">100%</p><p class="text-xs text-slate-500 mt-1">Free to Use</p></div>
-          </div>
-
-          <!-- MATCHED FOR YOU -->
           <div class="mt-8">
-            <div class="flex items-center justify-between mb-4">
-              <h3 class="text-lg font-bold text-slate-900">Matched for You</h3>
-              <button data-nav="#profile" class="text-sm font-medium text-brand-600 hover:underline">Update profile →</button>
-            </div>
+            <h3 class="text-lg font-bold text-slate-900 mb-4">Matched for You</h3>
             <div id="home-matched" class="grid sm:grid-cols-2 xl:grid-cols-3 gap-4"></div>
           </div>
         </section>
 
-        <!-- ---------- VIEW: SCHOLARSHIPS ---------- -->
+        <!-- SCHOLARSHIPS VIEW -->
         <section id="view-scholarships" class="view hidden animate-fade-in">
-          <div class="mb-6">
-            <h2 class="text-2xl font-bold text-slate-900">Scholarships</h2>
-            <p class="text-sm text-slate-500 mt-1">Filtered by your profile. <span id="scholarship-count" class="font-medium text-brand-600"></span></p>
-          </div>
-          <div class="flex flex-wrap gap-2 mb-5" id="scholarship-filters"></div>
+          <h2 class="text-2xl font-bold text-slate-900 mb-1">Scholarships</h2>
+          <p class="text-sm text-slate-500 mb-6">Filtered by your profile.</p>
           <div id="scholarship-list" class="grid sm:grid-cols-2 xl:grid-cols-3 gap-4"></div>
         </section>
 
-        <!-- ---------- VIEW: SCHEMES ---------- -->
+        <!-- SCHEMES VIEW -->
         <section id="view-schemes" class="view hidden animate-fade-in">
-          <div class="mb-6">
-            <h2 class="text-2xl font-bold text-slate-900">Government Schemes</h2>
-            <p class="text-sm text-slate-500 mt-1">Welfare schemes you may be eligible for.</p>
-          </div>
-          <div class="flex flex-wrap gap-2 mb-5" id="scheme-filters"></div>
+          <h2 class="text-2xl font-bold text-slate-900 mb-1">Government Schemes</h2>
+          <p class="text-sm text-slate-500 mb-6">Welfare schemes you may be eligible for.</p>
           <div id="scheme-list" class="grid sm:grid-cols-2 xl:grid-cols-3 gap-4"></div>
         </section>
 
-        <!-- ---------- VIEW: JOBS ---------- -->
+        <!-- JOBS VIEW -->
         <section id="view-jobs" class="view hidden animate-fade-in">
-          <div class="mb-6">
-            <h2 class="text-2xl font-bold text-slate-900">Government Jobs</h2>
-            <p class="text-sm text-slate-500 mt-1">Eligibility, cutoffs, and preparation resources.</p>
-          </div>
-          <div class="flex flex-wrap gap-2 mb-5" id="job-filters"></div>
+          <h2 class="text-2xl font-bold text-slate-900 mb-1">Government Jobs</h2>
+          <p class="text-sm text-slate-500 mb-6">Eligibility, cutoffs, and preparation resources.</p>
           <div id="job-list" class="grid sm:grid-cols-2 xl:grid-cols-3 gap-4"></div>
         </section>
 
-        <!-- ---------- VIEW: PREPARATION ---------- -->
+        <!-- PREPARATION VIEW -->
         <section id="view-preparation" class="view hidden animate-fade-in">
-          <div class="mb-6">
-            <h2 class="text-2xl font-bold text-slate-900">Preparation Hub</h2>
-            <p class="text-sm text-slate-500 mt-1">Free and curated YouTube resources for WBPSC, WB Police, and more.</p>
-          </div>
+          <h2 class="text-2xl font-bold text-slate-900 mb-6">Preparation Hub</h2>
           <div id="preparation-grid" class="grid sm:grid-cols-2 xl:grid-cols-3 gap-4"></div>
         </section>
 
-        <!-- ---------- VIEW: PROFILE ---------- -->
+        <!-- PROFILE VIEW -->
         <section id="view-profile" class="view hidden animate-fade-in">
           <div class="max-w-3xl">
             <h2 class="text-2xl font-bold text-slate-900 mb-1">My Profile</h2>
-            <p class="text-sm text-slate-500 mb-6">Complete your profile to get accurate scheme and job matches.</p>
-
-            <div id="profile-guest" class="hidden glass rounded-2xl p-8 text-center">
-              <div class="w-16 h-16 mx-auto rounded-2xl bg-brand-50 flex items-center justify-center text-3xl mb-4">🔐</div>
+            <div id="profile-guest" class="hidden glass rounded-2xl p-8 text-center mt-6">
               <h3 class="font-bold text-slate-900 mb-2">Sign in to continue</h3>
-              <p class="text-sm text-slate-500 mb-5 max-w-sm mx-auto">Use Google to securely sign in. Your profile powers personalised scheme and job matching.</p>
-              <button id="btn-signin-profile" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-brand-600 text-white font-semibold text-sm hover:bg-brand-700 transition">Sign in with Google</button>
+              <button id="btn-signin-profile" class="mt-4 px-5 py-2.5 rounded-xl bg-brand-600 text-white font-semibold text-sm">Sign in with Google</button>
             </div>
 
-            <form id="profile-form" class="hidden space-y-5">
-              <!-- Avatar -->
+            <form id="profile-form" class="hidden space-y-5 mt-6">
               <div class="glass rounded-2xl p-5 flex items-center gap-5">
-                <div class="relative">
-                  <img id="profile-avatar-preview" class="w-20 h-20 rounded-full object-cover bg-slate-200 ring-4 ring-white shadow" alt="Profile" />
-                  <label for="avatar-input" class="absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-brand-600 text-white flex items-center justify-center cursor-pointer shadow-lg hover:bg-brand-700 transition text-sm">✎</label>
+                <img id="profile-avatar-preview" class="w-20 h-20 rounded-full object-cover bg-slate-200" />
+                <div>
+                  <label for="avatar-input" class="px-3 py-1 bg-brand-600 text-white text-xs font-semibold rounded-lg cursor-pointer">Upload Photo</label>
                   <input id="avatar-input" type="file" accept="image/*" class="hidden" />
                 </div>
-                <div>
-                  <p class="font-semibold text-slate-800">Profile Photo</p>
-                  <p class="text-xs text-slate-500">JPG or PNG, max 2 MB.</p>
-                </div>
               </div>
-
-              <!-- Personal -->
-              <div class="glass rounded-2xl p-5 space-y-4">
-                <h3 class="font-semibold text-slate-800 text-sm uppercase tracking-wide">Personal Details</h3>
-                <div class="grid sm:grid-cols-2 gap-4">
-                  <div><label class="block text-xs font-medium text-slate-500 mb-1">Full Name</label><input name="full_name" type="text" class="w-full px-3 py-2.5 rounded-xl border border-slate-200 focus:border-brand-400 focus:ring-2 focus:ring-brand-100 outline-none text-sm bg-white" placeholder="Your full name" /></div>
-                  <div><label class="block text-xs font-medium text-slate-500 mb-1">Date of Birth</label><input name="date_of_birth" type="date" class="w-full px-3 py-2.5 rounded-xl border border-slate-200 focus:border-brand-400 focus:ring-2 focus:ring-brand-100 outline-none text-sm bg-white" /></div>
-                  <div><label class="block text-xs font-medium text-slate-500 mb-1">Gender</label>
-                    <select name="gender" class="w-full px-3 py-2.5 rounded-xl border border-slate-200 focus:border-brand-400 focus:ring-2 focus:ring-brand-100 outline-none text-sm bg-white">
-                      <option value="">Select</option><option>Male</option><option>Female</option><option>Other</option>
-                    </select>
-                  </div>
-                  <div><label class="block text-xs font-medium text-slate-500 mb-1">Caste / Community</label>
-                    <select name="caste" class="w-full px-3 py-2.5 rounded-xl border border-slate-200 focus:border-brand-400 focus:ring-2 focus:ring-brand-100 outline-none text-sm bg-white">
-                      <option value="">Select</option><option>General</option><option>SC</option><option>ST</option><option>OBC-A</option><option>OBC-B</option><option>EWS</option><option>Minority</option>
-                    </select>
-                  </div>
-                  <div><label class="block text-xs font-medium text-slate-500 mb-1">State</label><input name="state" type="text" class="w-full px-3 py-2.5 rounded-xl border border-slate-200 focus:border-brand-400 focus:ring-2 focus:ring-brand-100 outline-none text-sm bg-white" placeholder="e.g. West Bengal" /></div>
-                  <div><label class="block text-xs font-medium text-slate-500 mb-1">District</label><input name="district" type="text" class="w-full px-3 py-2.5 rounded-xl border border-slate-200 focus:border-brand-400 focus:ring-2 focus:ring-brand-100 outline-none text-sm bg-white" placeholder="e.g. Kolkata" /></div>
-                  <div><label class="block text-xs font-medium text-slate-500 mb-1">Annual Family Income (₹)</label><input name="annual_family_income" type="number" min="0" class="w-full px-3 py-2.5 rounded-xl border border-slate-200 focus:border-brand-400 focus:ring-2 focus:ring-brand-100 outline-none text-sm bg-white" placeholder="e.g. 150000" /></div>
-                </div>
+              <div class="glass rounded-2xl p-5 grid sm:grid-cols-2 gap-4">
+                <div><label class="text-xs font-medium text-slate-500 mb-1 block">Full Name</label><input name="full_name" type="text" class="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm" /></div>
+                <div><label class="text-xs font-medium text-slate-500 mb-1 block">DOB</label><input name="date_of_birth" type="date" class="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm" /></div>
+                <div><label class="text-xs font-medium text-slate-500 mb-1 block">Gender</label><select name="gender" class="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm"><option value="">Select</option><option>Male</option><option>Female</option><option>Other</option></select></div>
+                <div><label class="text-xs font-medium text-slate-500 mb-1 block">Caste</label><select name="caste" class="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm"><option value="">Select</option><option>General</option><option>SC</option><option>ST</option><option>OBC-A</option><option>OBC-B</option><option>EWS</option></select></div>
+                <div><label class="text-xs font-medium text-slate-500 mb-1 block">State</label><input name="state" type="text" class="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm" /></div>
+                <div><label class="text-xs font-medium text-slate-500 mb-1 block">District</label><input name="district" type="text" class="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm" /></div>
+                <div><label class="text-xs font-medium text-slate-500 mb-1 block">Class 10 %</label><input name="class10_percentage" type="number" class="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm" /></div>
+                <div><label class="text-xs font-medium text-slate-500 mb-1 block">Class 12 %</label><input name="class12_percentage" type="number" class="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm" /></div>
               </div>
-
-              <!-- Education -->
-              <div class="glass rounded-2xl p-5 space-y-4">
-                <h3 class="font-semibold text-slate-800 text-sm uppercase tracking-wide">Education</h3>
-                <div class="grid sm:grid-cols-2 gap-4">
-                  <div><label class="block text-xs font-medium text-slate-500 mb-1">Class 10 Passing Year</label><input name="class10_year" type="number" min="1950" max="2035" class="w-full px-3 py-2.5 rounded-xl border border-slate-200 focus:border-brand-400 focus:ring-2 focus:ring-brand-100 outline-none text-sm bg-white" placeholder="e.g. 2022" /></div>
-                  <div><label class="block text-xs font-medium text-slate-500 mb-1">Class 10 Percentage</label><input name="class10_percentage" type="number" step="0.01" min="0" max="100" class="w-full px-3 py-2.5 rounded-xl border border-slate-200 focus:border-brand-400 focus:ring-2 focus:ring-brand-100 outline-none text-sm bg-white" placeholder="e.g. 78.5" /></div>
-                  <div><label class="block text-xs font-medium text-slate-500 mb-1">Class 12 Passing Year</label><input name="class12_year" type="number" min="1950" max="2035" class="w-full px-3 py-2.5 rounded-xl border border-slate-200 focus:border-brand-400 focus:ring-2 focus:ring-brand-100 outline-none text-sm bg-white" placeholder="e.g. 2024" /></div>
-                  <div><label class="block text-xs font-medium text-slate-500 mb-1">Class 12 Percentage</label><input name="class12_percentage" type="number" step="0.01" min="0" max="100" class="w-full px-3 py-2.5 rounded-xl border border-slate-200 focus:border-brand-400 focus:ring-2 focus:ring-brand-100 outline-none text-sm bg-white" placeholder="e.g. 72.0" /></div>
-                  <div><label class="block text-xs font-medium text-slate-500 mb-1">Higher Degree / Certificate</label><input name="higher_degree" type="text" class="w-full px-3 py-2.5 rounded-xl border border-slate-200 focus:border-brand-400 focus:ring-2 focus:ring-brand-100 outline-none text-sm bg-white" placeholder="e.g. B.A., B.Tech" /></div>
-                  <div><label class="block text-xs font-medium text-slate-500 mb-1">Higher Degree Percentage</label><input name="higher_percentage" type="number" step="0.01" min="0" max="100" class="w-full px-3 py-2.5 rounded-xl border border-slate-200 focus:border-brand-400 focus:ring-2 focus:ring-brand-100 outline-none text-sm bg-white" placeholder="e.g. 68.0" /></div>
-                </div>
-              </div>
-
-              <div class="flex items-center gap-3">
-                <button type="submit" class="px-6 py-2.5 rounded-xl bg-brand-600 text-white font-semibold text-sm hover:bg-brand-700 transition shadow">Save Profile</button>
-                <span id="profile-save-status" class="text-sm text-slate-400"></span>
-              </div>
+              <button type="submit" class="px-6 py-2.5 rounded-xl bg-brand-600 text-white font-semibold text-sm">Save Profile</button>
             </form>
           </div>
         </section>
 
-        <!-- ---------- VIEW: ADMIN ---------- -->
+        <!-- ADMIN VIEW -->
         <section id="view-admin" class="view hidden animate-fade-in">
-          <div class="mb-6">
-            <h2 class="text-2xl font-bold text-slate-900">Admin Panel</h2>
-            <p class="text-sm text-slate-500 mt-1">Manage schemes, scholarships, and jobs. Use the AI parser to onboard new entries quickly.</p>
-          </div>
-
-          <!-- AI AUTO-UPDATER -->
+          <h2 class="text-2xl font-bold text-red-600 mb-6">Admin Control Panel</h2>
           <div class="glass rounded-2xl p-5 mb-6 border-l-4 border-brand-500">
-            <div class="flex items-center gap-3 mb-3">
-              <div class="w-9 h-9 rounded-xl bg-brand-100 text-brand-700 flex items-center justify-center text-lg">🤖</div>
-              <div><h3 class="font-bold text-slate-900 text-sm">AI Auto-Updater</h3><p class="text-xs text-slate-500">Paste raw scheme/job text. The parser extracts fields for your review.</p></div>
-            </div>
-            <textarea id="ai-raw-input" rows="5" class="w-full px-3 py-2.5 rounded-xl border border-slate-200 focus:border-brand-400 focus:ring-2 focus:ring-brand-100 outline-none text-sm bg-white mb-3" placeholder="Example: West Bengal Annapurna Yojana provides ₹1,000/month to women aged 18-60. Family income must be below ₹2.5 lakh. Apply at wb.gov.in before 31 Dec 2026."></textarea>
-            <div class="flex flex-wrap gap-2">
-              <button id="btn-ai-parse" class="px-4 py-2 rounded-xl bg-brand-600 text-white font-semibold text-sm hover:bg-brand-700 transition">Parse & Preview</button>
-              <button id="btn-ai-clear" class="px-4 py-2 rounded-xl bg-white border border-slate-200 text-slate-600 font-semibold text-sm hover:bg-slate-50 transition">Clear</button>
-            </div>
-            <div id="ai-preview" class="hidden mt-4 p-4 rounded-xl bg-slate-50 border border-slate-200 text-sm space-y-2"></div>
-          </div>
-
-          <!-- MANUAL CRUD -->
-          <div class="flex flex-wrap gap-2 mb-4">
-            <button id="btn-admin-new-scheme" class="px-4 py-2 rounded-xl bg-white border border-slate-200 text-sm font-semibold hover:border-brand-300 transition">+ New Scheme / Scholarship</button>
-            <button id="btn-admin-new-job" class="px-4 py-2 rounded-xl bg-white border border-slate-200 text-sm font-semibold hover:border-brand-300 transition">+ New Job</button>
-            <button id="btn-admin-refresh" class="px-4 py-2 rounded-xl bg-white border border-slate-200 text-sm font-semibold hover:border-brand-300 transition">↻ Refresh Data</button>
+            <h3 class="font-bold text-sm mb-2">🤖 AI Auto-Updater</h3>
+            <textarea id="ai-raw-input" rows="3" class="w-full p-3 rounded-xl border border-slate-200 text-sm mb-3" placeholder="Paste scheme/job text here..."></textarea>
+            <button id="btn-ai-parse" class="px-4 py-2 bg-brand-600 text-white rounded-xl text-sm font-semibold">Parse & Save</button>
+            <div id="ai-preview" class="hidden mt-4 p-4 rounded-xl bg-slate-100 text-xs"></div>
           </div>
           <div id="admin-list" class="space-y-3"></div>
         </section>
 
       </main>
 
-      <!-- ---------- BOTTOM NAV (MOBILE) ---------- -->
+      <!-- BOTTOM NAV (MOBILE) -->
       <nav class="lg:hidden fixed bottom-0 inset-x-0 z-40 glass border-t border-slate-200/60">
         <div class="grid grid-cols-5">
-          <a href="#home" class="nav-link flex flex-col items-center gap-1 py-2.5 text-[10px] font-medium text-slate-500"><span class="text-lg">🏠</span>Home</a>
-          <a href="#scholarships" class="nav-link flex flex-col items-center gap-1 py-2.5 text-[10px] font-medium text-slate-500"><span class="text-lg">🎓</span>Scholarships</a>
-          <a href="#jobs" class="nav-link flex flex-col items-center gap-1 py-2.5 text-[10px] font-medium text-slate-500"><span class="text-lg">💼</span>Jobs</a>
-          <a href="#preparation" class="nav-link flex flex-col items-center gap-1 py-2.5 text-[10px] font-medium text-slate-500"><span class="text-lg">📚</span>Prep</a>
-          <a href="#profile" class="nav-link flex flex-col items-center gap-1 py-2.5 text-[10px] font-medium text-slate-500"><span class="text-lg">👤</span>Profile</a>
+          <a href="#home" class="nav-link flex flex-col items-center py-2.5 text-[10px] font-medium text-slate-500"><span class="text-lg">🏠</span>Home</a>
+          <a href="#scholarships" class="nav-link flex flex-col items-center py-2.5 text-[10px] font-medium text-slate-500"><span class="text-lg">🎓</span>Scholar</a>
+          <a href="#jobs" class="nav-link flex flex-col items-center py-2.5 text-[10px] font-medium text-slate-500"><span class="text-lg">💼</span>Jobs</a>
+          <a href="#preparation" class="nav-link flex flex-col items-center py-2.5 text-[10px] font-medium text-slate-500"><span class="text-lg">📚</span>Prep</a>
+          <a href="#profile" class="nav-link flex flex-col items-center py-2.5 text-[10px] font-medium text-slate-500"><span class="text-lg">👤</span>Profile</a>
         </div>
       </nav>
-
     </div>
   </div>
 
-  <!-- ================= FLOATING AI ASSISTANT ================= -->
-  <div id="assistant-widget" class="fixed z-50 bottom-20 lg:bottom-6 right-4 lg:right-6">
-    <button id="assistant-btn" class="w-14 h-14 rounded-full bg-gradient-to-br from-brand-600 to-saffron-500 text-white shadow-2xl flex items-center justify-center text-2xl hover:scale-105 transition-transform cursor-grab active:cursor-grabbing" aria-label="Open AI Assistant">🤖</button>
-  </div>
-
-  <div id="assistant-panel" class="fixed z-50 bottom-36 lg:bottom-24 right-4 lg:right-6 w-[calc(100vw-2rem)] max-w-sm hidden animate-slide-up">
-    <div class="glass-dark rounded-2xl shadow-2xl overflow-hidden flex flex-col" style="height: 480px; max-height: 70vh;">
-      <div class="flex items-center justify-between px-4 py-3 border-b border-white/10">
-        <div class="flex items-center gap-2">
-          <div class="w-8 h-8 rounded-full bg-gradient-to-br from-brand-500 to-saffron-500 flex items-center justify-center text-sm">🤖</div>
-          <div><p class="text-white font-semibold text-sm">Navigator AI</p><p class="text-[10px] text-emerald-400">● Online · Demo</p></div>
-        </div>
-        <button id="assistant-close" class="text-white/60 hover:text-white text-xl leading-none">×</button>
-      </div>
-      <div id="assistant-messages" class="flex-1 overflow-y-auto p-4 space-y-3 no-scrollbar text-sm"></div>
-      <form id="assistant-form" class="p-3 border-t border-white/10 flex gap-2">
-        <input id="assistant-input" type="text" class="flex-1 px-3 py-2.5 rounded-xl bg-white/10 border border-white/20 text-white placeholder:text-white/40 text-sm outline-none focus:border-brand-400" placeholder="Ask about schemes, jobs, eligibility…" autocomplete="off" />
-        <button type="submit" class="px-3 py-2.5 rounded-xl bg-brand-600 text-white text-sm font-semibold hover:bg-brand-500 transition">Send</button>
-      </form>
-    </div>
-  </div>
-
-  <!-- ================= MODAL: GENERIC ================= -->
+  <!-- MODAL -->
   <div id="modal-overlay" class="fixed inset-0 z-[80] bg-slate-900/50 backdrop-blur-sm hidden items-center justify-center p-4">
-    <div id="modal-content" class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto animate-slide-up"></div>
+    <div id="modal-content" class="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6"></div>
   </div>
 
-  <!-- ================= SUPABASE & APP LOGIC ================= -->
+  <!-- ================= APP LOGIC ================= -->
   <script type="module">
     // ============================================================
-    // 1. CONFIGURATION
+    // 1. CONFIGURATION (এখানে আপনার Supabase Key এবং Admin Email দিন)
     // ============================================================
     const SUPABASE_URL = 'https://kzbhpwtcsowzivgpellr.supabase.co';
-    // ⚠️ Replace with your Supabase anon/publishable key.
-    // The anon key is safe for client-side use when RLS is enabled.
-    const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+    
+    // ⚠️ এখানে আপনার Supabase "anon" key পেস্ট করুন (Project Settings > API)
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...YOUR_ACTUAL_KEY_HERE'; 
 
-    // ============================================================
-    // 2. SUPABASE CLIENT
-    // ============================================================
+    // ⚠️ এখানে আপনার জিমেইল দিন, যেটা দিয়ে অ্যাডমিন প্যানেলে ঢুকতে চান
+    const ADMIN_EMAILS = ['your-email@gmail.com', 'admin@example.com'];
+
     import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
@@ -346,742 +228,275 @@
     });
 
     // ============================================================
-    // 3. GLOBAL STATE
+    // 2. STATE & UTILS
     // ============================================================
-    const state = {
-      user: null,
-      profile: null,
-      schemes: [],
-      jobs: [],
-      filters: { scholarships: 'all', schemes: 'all', jobs: 'all' },
-      assistantOpen: false
-    };
-
-    // ============================================================
-    // 4. UTILITIES
-    // ============================================================
-    const $ = (sel, root = document) => root.querySelector(sel);
-    const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
+    const state = { user: null, profile: null, schemes: [], jobs: [] };
+    const $ = (sel) => document.querySelector(sel);
+    const $$ = (sel) => [...document.querySelectorAll(sel)];
 
     function showLoader(show = true) { $('#global-loader').classList.toggle('hidden', !show); }
-
-    function toast(message, type = 'info') {
+    
+    function toast(msg, type = 'info') {
       const colors = { success: 'bg-emerald-600', error: 'bg-red-600', info: 'bg-slate-800', warn: 'bg-amber-500' };
       const el = document.createElement('div');
-      el.className = `${colors[type] || colors.info} text-white text-sm font-medium px-4 py-3 rounded-xl shadow-lg animate-slide-up flex items-start gap-2`;
-      el.innerHTML = `<span>${type === 'error' ? '⚠️' : type === 'success' ? '✅' : 'ℹ️'}</span><span class="flex-1">${message}</span>`;
+      el.className = `${colors[type]} text-white text-sm px-4 py-3 rounded-xl shadow-lg mb-2 animate-slide-up`;
+      el.textContent = msg;
       $('#toast-container').appendChild(el);
-      setTimeout(() => { el.style.opacity = '0'; el.style.transition = 'opacity .3s'; setTimeout(() => el.remove(), 300); }, 4000);
+      setTimeout(() => el.remove(), 4000);
     }
 
-    function safe(fn, fallback = null) {
-      try { return fn(); } catch (e) { console.warn('Safe wrapper caught:', e); return fallback; }
-    }
-
-    function escapeHtml(str) {
-      if (!str) return '';
-      const div = document.createElement('div');
-      div.textContent = str;
-      return div.innerHTML;
-    }
-
-    function formatDate(d) {
-      if (!d) return '—';
-      try { return new Date(d).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }); }
-      catch { return d; }
-    }
-
-    function calcAge(dob) {
-      if (!dob) return null;
-      const birth = new Date(dob);
-      if (isNaN(birth)) return null;
-      const diff = Date.now() - birth.getTime();
-      return Math.floor(diff / (1000 * 60 * 60 * 24 * 365.25));
-    }
+    const escapeHtml = (str) => { if(!str) return ''; const div = document.createElement('div'); div.textContent = str; return div.innerHTML; };
+    const formatDate = (d) => d ? new Date(d).toLocaleDateString('en-IN') : '—';
 
     // ============================================================
-    // 5. AUTH
+    // 3. AUTH & PROFILE
     // ============================================================
     async function signInWithGoogle() {
       try {
         showLoader(true);
         const { error } = await supabase.auth.signInWithOAuth({
           provider: 'google',
-          options: {
-            redirectTo: window.location.origin + window.location.pathname,
-            scopes: 'email profile'
-          }
+          options: { redirectTo: window.location.origin + window.location.pathname }
         });
         if (error) throw error;
       } catch (err) {
-        console.error('Google sign-in error:', err);
-        toast('Google sign-in failed. Please check your Supabase OAuth settings.', 'error');
-      } finally {
-        showLoader(false);
-      }
-    }
-
-    async function signOut() {
-      try {
-        showLoader(true);
-        const { error } = await supabase.auth.signOut();
-        if (error) throw error;
-        state.user = null; state.profile = null;
-        toast('Signed out successfully.', 'success');
-        renderAuthUI();
-        renderAll();
-      } catch (err) {
-        console.error('Sign-out error:', err);
-        toast('Could not sign out. Try again.', 'error');
+        console.error(err);
+        toast('Login failed. Check Supabase OAuth settings.', 'error');
       } finally { showLoader(false); }
     }
 
-    async function getSession() {
-      const { data: { session }, error } = await supabase.auth.getSession();
-      if (error) { console.error('getSession error:', error); return null; }
-      return session;
+    async function signOut() {
+      await supabase.auth.signOut();
+      state.user = null; state.profile = null;
+      toast('Signed out.', 'success');
+      renderAll();
     }
 
-    // ============================================================
-    // 6. PROFILE
-    // ============================================================
     async function loadProfile() {
-      if (!state.user) { state.profile = null; return; }
+      if (!state.user) return;
       const { data, error } = await supabase.from('profiles').select('*').eq('id', state.user.id).maybeSingle();
-      if (error) { console.error('loadProfile error:', error); return; }
+      if (error) {
+        console.error('Profile load error:', error);
+        toast('Could not load profile. Did you run the SQL setup?', 'error');
+        return;
+      }
       state.profile = data;
     }
 
     async function saveProfile(formData) {
-      if (!state.user) { toast('Please sign in first.', 'warn'); return; }
+      if (!state.user) return;
       const payload = {
         id: state.user.id,
-        full_name: formData.get('full_name') || null,
+        full_name: formData.get('full_name'),
         date_of_birth: formData.get('date_of_birth') || null,
         gender: formData.get('gender') || null,
         caste: formData.get('caste') || null,
         state: formData.get('state') || null,
         district: formData.get('district') || null,
-        annual_family_income: formData.get('annual_family_income') ? Number(formData.get('annual_family_income')) : null,
-        class10_year: formData.get('class10_year') ? Number(formData.get('class10_year')) : null,
         class10_percentage: formData.get('class10_percentage') ? Number(formData.get('class10_percentage')) : null,
-        class12_year: formData.get('class12_year') ? Number(formData.get('class12_year')) : null,
         class12_percentage: formData.get('class12_percentage') ? Number(formData.get('class12_percentage')) : null,
-        higher_degree: formData.get('higher_degree') || null,
-        higher_percentage: formData.get('higher_percentage') ? Number(formData.get('higher_percentage')) : null,
         updated_at: new Date().toISOString()
       };
-      // Auto-calculate age from DOB
-      if (payload.date_of_birth) {
-        const age = calcAge(payload.date_of_birth);
-        if (age !== null) payload.age = age;
-      }
       const { error } = await supabase.from('profiles').upsert(payload, { onConflict: 'id' });
-      if (error) { console.error('saveProfile error:', error); toast('Failed to save profile: ' + error.message, 'error'); return; }
+      if (error) {
+        console.error(error);
+        toast('Failed to save profile: ' + error.message, 'error');
+        return;
+      }
       await loadProfile();
-      toast('Profile saved! Matches refreshed.', 'success');
-      $('#profile-save-status').textContent = 'Saved ✓';
-      setTimeout(() => { const el = $('#profile-save-status'); if (el) el.textContent = ''; }, 2500);
+      toast('Profile saved!', 'success');
       renderAll();
     }
 
-    async function uploadAvatar(file) {
-      if (!state.user || !file) return;
-      if (file.size > 2 * 1024 * 1024) { toast('Image must be under 2 MB.', 'warn'); return; }
-      const ext = file.name.split('.').pop() || 'png';
-      const path = `${state.user.id}/avatar.${ext}`;
-      try {
-        showLoader(true);
-        const { error: upErr } = await supabase.storage.from('avatars').upload(path, file, { upsert: true, cacheControl: '3600', contentType: file.type });
-        if (upErr) throw upErr;
-        const { data: pub } = supabase.storage.from('avatars').getPublicUrl(path);
-        const url = pub.publicUrl + '?t=' + Date.now();
-        const { error: dbErr } = await supabase.from('profiles').update({ avatar_url: url }).eq('id', state.user.id);
-        if (dbErr) throw dbErr;
-        await loadProfile();
-        renderAuthUI();
-        toast('Profile photo updated.', 'success');
-      } catch (err) {
-        console.error('uploadAvatar error:', err);
-        toast('Avatar upload failed. Ensure the "avatars" bucket exists and policies are set.', 'error');
-      } finally { showLoader(false); }
+    // ============================================================
+    // 4. DATA FETCHING
+    // ============================================================
+    async function loadData() {
+      // Schemes
+      const { data: sch, error: e1 } = await supabase.from('schemes').select('*');
+      if (e1) { console.error('Schemes fetch error:', e1); toast('Could not load schemes. (Check Table & RLS)', 'error'); }
+      else state.schemes = sch || [];
+
+      // Jobs
+      const { data: jb, error: e2 } = await supabase.from('jobs').select('*');
+      if (e2) { console.error('Jobs fetch error:', e2); toast('Could not load jobs. (Check Table & RLS)', 'error'); }
+      else state.jobs = jb || [];
     }
 
     // ============================================================
-    // 7. DATA FETCHING (SCHEMES & JOBS)
-    // ============================================================
-    async function loadSchemes() {
-      const { data, error } = await supabase.from('schemes').select('*').order('created_at', { ascending: false });
-      if (error) { console.error('loadSchemes error:', error); toast('Could not load schemes.', 'error'); return []; }
-      state.schemes = data || [];
-      return state.schemes;
-    }
-
-    async function loadJobs() {
-      const { data, error } = await supabase.from('jobs').select('*').order('created_at', { ascending: false });
-      if (error) { console.error('loadJobs error:', error); toast('Could not load jobs.', 'error'); return []; }
-      state.jobs = data || [];
-      return state.jobs;
-    }
-
-    // ============================================================
-    // 8. PROFILE-BASED MATCHING ENGINE
+    // 5. MATCHING ENGINE
     // ============================================================
     function matchesProfile(item, profile) {
-      if (!profile) return true; // No profile → show everything
-      // State filter
-      if (item.eligible_states && !item.eligible_states.includes('All')) {
-        if (profile.state && !item.eligible_states.includes(profile.state)) return false;
-      }
-      // Caste filter
-      if (item.eligible_castes && !item.eligible_castes.includes('All')) {
-        if (profile.caste && !item.eligible_castes.includes(profile.caste)) return false;
-      }
-      // Gender filter
-      if (item.gender && item.gender !== 'All' && profile.gender && item.gender !== profile.gender) return false;
-      // Age
-      const age = profile.age || calcAge(profile.date_of_birth);
-      if (item.min_age && age && age < item.min_age) return false;
-      if (item.max_age && age && age > item.max_age) return false;
-      // Income
-      if (item.income_limit && profile.annual_family_income && profile.annual_family_income > item.income_limit) return false;
-      return true;
-    }
-
-    function matchJobs(job, profile) {
       if (!profile) return true;
-      if (job.state && job.state !== 'All' && profile.state && job.state !== profile.state) return false;
-      const age = profile.age || calcAge(profile.date_of_birth);
-      if (job.age_min && age && age < job.age_min) return false;
-      if (job.age_max && age && age > job.age_max) return false;
-      // Class 10 % check (with 5% relaxation for reserved categories)
-      const relax = profile.caste && profile.caste !== 'General' ? 5 : 0;
-      if (job.min_percentage_10 && profile.class10_percentage && profile.class10_percentage < (job.min_percentage_10 - relax)) return false;
-      if (job.min_percentage_12 && profile.class12_percentage && profile.class12_percentage < (job.min_percentage_12 - relax)) return false;
+      if (item.eligible_states && !item.eligible_states.includes('All') && profile.state && !item.eligible_states.includes(profile.state)) return false;
+      if (item.eligible_castes && !item.eligible_castes.includes('All') && profile.caste && !item.eligible_castes.includes(profile.caste)) return false;
       return true;
     }
 
     // ============================================================
-    // 9. RENDERING — CARDS & LISTS
+    // 6. RENDER FUNCTIONS
     // ============================================================
+    function renderAuthUI() {
+      const signedIn = !!state.user;
+      const isAdmin = state.user && ADMIN_EMAILS.includes(state.user.email);
+
+      $('#btn-signin-top').classList.toggle('hidden', signedIn);
+      $('#btn-signin-mobile').classList.toggle('hidden', signedIn);
+      $('#btn-signout-top').classList.toggle('hidden', !signedIn);
+      $('#sidebar-user').classList.toggle('hidden', !signedIn);
+      $('#profile-guest').classList.toggle('hidden', signedIn);
+      $('#profile-form').classList.toggle('hidden', !signedIn);
+
+      // Admin UI Toggle
+      const adminBtn = $('#nav-admin');
+      if (adminBtn) {
+        adminBtn.classList.toggle('hidden', !isAdmin);
+        adminBtn.classList.toggle('flex', isAdmin);
+      }
+      $('#btn-admin-login').classList.toggle('hidden', isAdmin || signedIn); // Hide if already admin
+
+      if (signedIn) {
+        $('#sidebar-name').textContent = state.profile?.full_name || state.user.email;
+      }
+    }
+
     function schemeCard(s) {
-      const isScholarship = s.type === 'scholarship';
       return `
-        <article class="bg-white rounded-2xl border border-slate-100 p-5 card-hover flex flex-col animate-fade-in">
-          <div class="flex items-start justify-between gap-2 mb-2">
-            <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md ${isScholarship ? 'bg-brand-50 text-brand-700' : 'bg-emerald-50 text-emerald-700'}">${isScholarship ? 'Scholarship' : 'Scheme'}</span>
-            ${s.deadline ? `<span class="text-[10px] font-medium text-amber-600">⏳ ${formatDate(s.deadline)}</span>` : ''}
-          </div>
-          <h3 class="font-bold text-slate-900 leading-snug mb-1.5 line-clamp-2">${escapeHtml(s.title)}</h3>
-          <p class="text-xs text-slate-500 line-clamp-3 mb-3 flex-1">${escapeHtml(s.description || s.eligibility || 'Details available on the official portal.')}</p>
-          <div class="flex flex-wrap gap-1.5 mb-3">
-            ${(s.eligible_states || []).slice(0,2).map(st => `<span class="text-[10px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">${escapeHtml(st)}</span>`).join('')}
-            ${(s.eligible_castes || []).slice(0,2).map(c => `<span class="text-[10px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">${escapeHtml(c)}</span>`).join('')}
-          </div>
-          <div class="flex items-center gap-2 mt-auto">
-            <button data-scheme-id="${s.id}" class="btn-scheme-detail flex-1 px-3 py-2 rounded-xl bg-brand-600 text-white text-xs font-semibold hover:bg-brand-700 transition">View Details</button>
-            ${s.apply_link ? `<a href="${escapeHtml(s.apply_link)}" target="_blank" rel="noopener" class="px-3 py-2 rounded-xl bg-white border border-slate-200 text-slate-600 text-xs font-semibold hover:border-brand-300 transition">Apply ↗</a>` : ''}
+        <article class="bg-white p-5 rounded-2xl border border-slate-100 card-hover">
+          <h3 class="font-bold text-slate-900 line-clamp-2">${escapeHtml(s.title)}</h3>
+          <p class="text-xs text-slate-500 mt-2 line-clamp-2">${escapeHtml(s.description || '')}</p>
+          <div class="mt-4 flex gap-2">
+             ${s.apply_link ? `<a href="${escapeHtml(s.apply_link)}" target="_blank" class="px-3 py-1.5 bg-brand-600 text-white text-xs rounded-lg">Apply</a>` : ''}
           </div>
         </article>`;
     }
 
     function jobCard(j) {
       return `
-        <article class="bg-white rounded-2xl border border-slate-100 p-5 card-hover flex flex-col animate-fade-in">
-          <div class="flex items-start justify-between gap-2 mb-2">
-            <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md bg-indigo-50 text-indigo-700">Govt Job</span>
-            ${j.deadline ? `<span class="text-[10px] font-medium text-amber-600">⏳ ${formatDate(j.deadline)}</span>` : ''}
+        <article class="bg-white p-5 rounded-2xl border border-slate-100 card-hover">
+          <h3 class="font-bold text-slate-900 line-clamp-2">${escapeHtml(j.title)}</h3>
+          <p class="text-xs text-slate-500 mt-1">${escapeHtml(j.organization || '')}</p>
+          <div class="mt-4">
+            <button onclick="window.alert('Job details modal can be added here.')" class="px-3 py-1.5 bg-indigo-600 text-white text-xs rounded-lg">View Details</button>
           </div>
-          <h3 class="font-bold text-slate-900 leading-snug mb-0.5 line-clamp-2">${escapeHtml(j.title)}</h3>
-          <p class="text-xs text-slate-500 mb-3">${escapeHtml(j.organization || '')} · ${escapeHtml(j.post_name || '')}</p>
-          <div class="grid grid-cols-2 gap-2 text-[11px] mb-3">
-            <div class="bg-slate-50 rounded-lg p-2"><p class="text-slate-400">Age</p><p class="font-semibold text-slate-700">${j.age_min || '—'}–${j.age_max || '—'} yrs</p></div>
-            <div class="bg-slate-50 rounded-lg p-2"><p class="text-slate-400">Qualification</p><p class="font-semibold text-slate-700 truncate">${escapeHtml(j.qualification || '—')}</p></div>
-          </div>
-          <button data-job-id="${j.id}" class="btn-job-detail w-full px-3 py-2 rounded-xl bg-brand-600 text-white text-xs font-semibold hover:bg-brand-700 transition">View Eligibility, Cutoffs & Prep</button>
         </article>`;
-    }
-
-    // ============================================================
-    // 10. RENDER — VIEWS
-    // ============================================================
-    function renderAuthUI() {
-      const signedIn = !!state.user;
-      const name = state.profile?.full_name || state.user?.email || 'User';
-      const avatar = state.profile?.avatar_url || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(name) + '&background=6366f1&color=fff';
-      // Top bar
-      $('#btn-signin-top').classList.toggle('hidden', signedIn);
-      $('#btn-signout-top').classList.toggle('hidden', !signedIn);
-      $('#btn-signin-top').classList.toggle('inline-flex', !signedIn);
-      $('#btn-signout-top').classList.toggle('inline-flex', signedIn);
-      $('#btn-signin-mobile').classList.toggle('hidden', signedIn);
-      // Sidebar
-      $('#sidebar-user').classList.toggle('hidden', !signedIn);
-      if (signedIn) {
-        $('#sidebar-avatar').src = avatar;
-        $('#sidebar-name').textContent = name;
-      }
-      // Admin nav
-      const isAdmin = state.profile?.role === 'admin';
-      $('#nav-admin').classList.toggle('hidden', !isAdmin);
-      $('#nav-admin').classList.toggle('flex', isAdmin);
-      // Profile view
-      $('#profile-guest').classList.toggle('hidden', signedIn);
-      $('#profile-form').classList.toggle('hidden', !signedIn);
-      if (signedIn && state.profile) {
-        $('#profile-avatar-preview').src = avatar;
-        // Fill form fields
-        const form = $('#profile-form');
-        if (form) {
-          const map = ['full_name','date_of_birth','gender','caste','state','district','annual_family_income','class10_year','class10_percentage','class12_year','class12_percentage','higher_degree','higher_percentage'];
-          map.forEach(k => { if (form.elements[k]) form.elements[k].value = state.profile[k] ?? ''; });
-        }
-      }
-    }
-
-    function renderHomeMatched() {
-      const el = $('#home-matched');
-      if (!el) return;
-      const matchedSchemes = state.schemes.filter(s => matchesProfile(s, state.profile)).slice(0, 3);
-      const matchedJobs = state.jobs.filter(j => matchJobs(j, state.profile)).slice(0, 3);
-      const combined = [...matchedSchemes.map(s => ({ kind: 'scheme', data: s })), ...matchedJobs.map(j => ({ kind: 'job', data: j }))];
-      if (!combined.length) {
-        el.innerHTML = `<div class="col-span-full text-center py-10 text-slate-400 text-sm">No matches yet. <button data-nav="#profile" class="text-brand-600 font-medium hover:underline">Complete your profile</button> to see personalised results.</div>`;
-        return;
-      }
-      el.innerHTML = combined.map(x => x.kind === 'scheme' ? schemeCard(x.data) : jobCard(x.data)).join('');
-    }
-
-    function renderSchemes() {
-      const isScholarshipView = location.hash === '#scholarships';
-      const listEl = isScholarshipView ? $('#scholarship-list') : $('#scheme-list');
-      const countEl = $('#scholarship-count');
-      const type = isScholarshipView ? 'scholarship' : 'scheme';
-      let items = state.schemes.filter(s => s.type === type && matchesProfile(s, state.profile));
-      if (countEl) countEl.textContent = `${items.length} found`;
-      if (!items.length) { listEl.innerHTML = `<div class="col-span-full text-center py-16 text-slate-400 text-sm">No ${type === 'scholarship' ? 'scholarships' : 'schemes'} match your profile right now.</div>`; return; }
-      listEl.innerHTML = items.map(schemeCard).join('');
-    }
-
-    function renderJobs() {
-      const listEl = $('#job-list');
-      let items = state.jobs.filter(j => matchJobs(j, state.profile));
-      if (!items.length) { listEl.innerHTML = `<div class="col-span-full text-center py-16 text-slate-400 text-sm">No jobs match your profile right now.</div>`; return; }
-      listEl.innerHTML = items.map(jobCard).join('');
-    }
-
-    function renderStats() {
-      const sch = state.schemes.length;
-      const jb = state.jobs.length;
-      const el1 = $('#stat-schemes'); if (el1) el1.textContent = sch;
-      const el2 = $('#stat-jobs'); if (el2) el2.textContent = jb;
-    }
-
-    function renderPreparation() {
-      const el = $('#preparation-grid');
-      if (!el) return;
-      const videos = [
-        { title: 'WBP Constable 2026 — Full Syllabus & Strategy', channel: 'Bengali Knowledge Academy', videoId: 'dQw4w9WgXcQ' },
-        { title: 'WBCS Prelims — Indian Polity Complete Course', channel: 'Adda247 Bengali', videoId: 'dQw4w9WgXcQ' },
-        { title: 'WB Police Maths — Previous Year Questions', channel: 'WBP Helper', videoId: 'dQw4w9WgXcQ' },
-        { title: 'WBPSC Miscellaneous — GK & Current Affairs', channel: 'WBPSC Guide', videoId: 'dQw4w9WgXcQ' },
-        { title: 'English for Competitive Exams — Full Course', channel: 'English with Rani Ma\'am', videoId: 'dQw4w9WgXcQ' },
-        { title: 'Reasoning Practice Set for WB Exams', channel: 'Reasoning by Deepak Sir', videoId: 'dQw4w9WgXcQ' }
-      ];
-      el.innerHTML = videos.map(v => `
-        <article class="bg-white rounded-2xl border border-slate-100 overflow-hidden card-hover">
-          <div class="aspect-video bg-slate-200">
-            <iframe class="w-full h-full" src="https://www.youtube.com/embed/${v.videoId}" title="${escapeHtml(v.title)}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
-          </div>
-          <div class="p-4">
-            <h3 class="font-semibold text-sm text-slate-900 line-clamp-2">${escapeHtml(v.title)}</h3>
-            <p class="text-xs text-slate-400 mt-1">${escapeHtml(v.channel)}</p>
-          </div>
-        </article>`).join('');
-    }
-
-    function renderAdminList() {
-      const el = $('#admin-list');
-      if (!el) return;
-      const all = [
-        ...state.schemes.map(s => ({ ...s, _kind: 'scheme' })),
-        ...state.jobs.map(j => ({ ...j, _kind: 'job' }))
-      ];
-      if (!all.length) { el.innerHTML = `<p class="text-sm text-slate-400 text-center py-8">No entries yet. Use the AI parser or manual buttons above.</p>`; return; }
-      el.innerHTML = all.map(item => `
-        <div class="bg-white rounded-xl border border-slate-100 p-4 flex items-center gap-3">
-          <span class="text-[10px] font-bold uppercase px-2 py-1 rounded ${item._kind === 'scheme' ? 'bg-brand-50 text-brand-700' : 'bg-indigo-50 text-indigo-700'}">${item._kind}</span>
-          <p class="flex-1 text-sm font-semibold text-slate-800 truncate">${escapeHtml(item.title)}</p>
-          <button data-admin-edit="${item._kind}:${item.id}" class="text-xs font-medium text-brand-600 hover:underline">Edit</button>
-          <button data-admin-delete="${item._kind}:${item.id}" class="text-xs font-medium text-red-500 hover:underline">Delete</button>
-        </div>`).join('');
     }
 
     function renderAll() {
       renderAuthUI();
-      renderHomeMatched();
-      renderSchemes();
-      renderJobs();
-      renderStats();
-      renderPreparation();
-      if (state.profile?.role === 'admin') renderAdminList();
+      
+      const schList = state.schemes.filter(s => s.type === 'scholarship' && matchesProfile(s, state.profile));
+      const scList = state.schemes.filter(s => s.type === 'scheme' && matchesProfile(s, state.profile));
+      const jbList = state.jobs.filter(j => matchesProfile(j, state.profile));
+
+      if ($('#scholarship-list')) $('#scholarship-list').innerHTML = schList.map(schemeCard).join('') || '<p class="text-sm text-slate-400">No scholarships found.</p>';
+      if ($('#scheme-list')) $('#scheme-list').innerHTML = scList.map(schemeCard).join('') || '<p class="text-sm text-slate-400">No schemes found.</p>';
+      if ($('#job-list')) $('#job-list').innerHTML = jbList.map(jobCard).join('') || '<p class="text-sm text-slate-400">No jobs found.</p>';
+      
+      const homeList = [...schList.slice(0,2).map(schemeCard), ...jbList.slice(0,2).map(jobCard)].join('');
+      if ($('#home-matched')) $('#home-matched').innerHTML = homeList || '<p class="text-sm text-slate-400">Complete your profile to see matches.</p>';
+
+      if (state.user && ADMIN_EMAILS.includes(state.user.email)) renderAdminList();
     }
 
     // ============================================================
-    // 11. MODALS
+    // 7. ADMIN PANEL
     // ============================================================
-    function openModal(html) {
-      $('#modal-content').innerHTML = html;
-      $('#modal-overlay').classList.remove('hidden');
-      $('#modal-overlay').classList.add('flex');
-    }
-    function closeModal() {
-      $('#modal-overlay').classList.add('hidden');
-      $('#modal-overlay').classList.remove('flex');
-    }
-
-    function showSchemeDetail(id) {
-      const s = state.schemes.find(x => String(x.id) === String(id));
-      if (!s) return;
-      openModal(`
-        <div class="p-6">
-          <div class="flex items-start justify-between gap-3 mb-3">
-            <div>
-              <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md ${s.type === 'scholarship' ? 'bg-brand-50 text-brand-700' : 'bg-emerald-50 text-emerald-700'}">${s.type}</span>
-              <h2 class="text-xl font-bold text-slate-900 mt-2">${escapeHtml(s.title)}</h2>
-            </div>
-            <button onclick="window.__closeModal()" class="text-slate-400 hover:text-slate-700 text-2xl leading-none">×</button>
-          </div>
-          <div class="space-y-4 text-sm">
-            ${s.description ? `<div><h4 class="font-semibold text-slate-800 mb-1">Description</h4><p class="text-slate-600">${escapeHtml(s.description)}</p></div>` : ''}
-            ${s.benefits ? `<div><h4 class="font-semibold text-slate-800 mb-1">Benefits</h4><p class="text-slate-600">${escapeHtml(s.benefits)}</p></div>` : ''}
-            ${s.eligibility ? `<div><h4 class="font-semibold text-slate-800 mb-1">Eligibility</h4><p class="text-slate-600">${escapeHtml(s.eligibility)}</p></div>` : ''}
-            <div class="grid grid-cols-2 gap-3">
-              ${s.deadline ? `<div class="bg-amber-50 rounded-lg p-3"><p class="text-[10px] text-amber-600 font-medium uppercase">Deadline</p><p class="font-semibold text-amber-800">${formatDate(s.deadline)}</p></div>` : ''}
-              ${s.income_limit ? `<div class="bg-slate-50 rounded-lg p-3"><p class="text-[10px] text-slate-400 font-medium uppercase">Income Limit</p><p class="font-semibold text-slate-700">₹${Number(s.income_limit).toLocaleString('en-IN')}</p></div>` : ''}
-            </div>
-            ${s.apply_link ? `<a href="${escapeHtml(s.apply_link)}" target="_blank" rel="noopener" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-brand-600 text-white font-semibold text-sm hover:bg-brand-700 transition">Apply on Official Portal ↗</a>` : ''}
-          </div>
-        </div>`);
-    }
-
-    function showJobDetail(id) {
-      const j = state.jobs.find(x => String(x.id) === String(id));
-      if (!j) return;
-      const cutoffs = Array.isArray(j.cutoff_data) ? j.cutoff_data : [];
-      const resources = Array.isArray(j.preparation_resources) ? j.preparation_resources : [];
-      openModal(`
-        <div class="p-6">
-          <div class="flex items-start justify-between gap-3 mb-3">
-            <div>
-              <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md bg-indigo-50 text-indigo-700">Govt Job</span>
-              <h2 class="text-xl font-bold text-slate-900 mt-2">${escapeHtml(j.title)}</h2>
-              <p class="text-sm text-slate-500">${escapeHtml(j.organization || '')} · ${escapeHtml(j.post_name || '')}</p>
-            </div>
-            <button onclick="window.__closeModal()" class="text-slate-400 hover:text-slate-700 text-2xl leading-none">×</button>
-          </div>
-          <div class="space-y-4 text-sm">
-            ${j.description ? `<p class="text-slate-600">${escapeHtml(j.description)}</p>` : ''}
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
-              <div class="bg-slate-50 rounded-lg p-3"><p class="text-[10px] text-slate-400 uppercase">Age</p><p class="font-semibold text-slate-700">${j.age_min || '—'}–${j.age_max || '—'}</p></div>
-              <div class="bg-slate-50 rounded-lg p-3"><p class="text-[10px] text-slate-400 uppercase">Qualification</p><p class="font-semibold text-slate-700 text-xs">${escapeHtml(j.qualification || '—')}</p></div>
-              <div class="bg-slate-50 rounded-lg p-3"><p class="text-[10px] text-slate-400 uppercase">Deadline</p><p class="font-semibold text-slate-700 text-xs">${formatDate(j.deadline)}</p></div>
-              <div class="bg-slate-50 rounded-lg p-3"><p class="text-[10px] text-slate-400 uppercase">State</p><p class="font-semibold text-slate-700 text-xs">${escapeHtml(j.state || 'All')}</p></div>
-            </div>
-            ${cutoffs.length ? `<div><h4 class="font-semibold text-slate-800 mb-2">Previous Year Cutoffs</h4>
-              <div class="overflow-x-auto"><table class="w-full text-xs border border-slate-200 rounded-lg overflow-hidden">
-                <thead class="bg-slate-100"><tr><th class="text-left px-3 py-2 font-semibold text-slate-600">Category</th><th class="text-left px-3 py-2 font-semibold text-slate-600">Marks</th></tr></thead>
-                <tbody>${cutoffs.map(c => `<tr class="border-t border-slate-100"><td class="px-3 py-2 text-slate-600">${escapeHtml(c.category)}</td><td class="px-3 py-2 font-medium text-slate-800">${escapeHtml(String(c.marks))}</td></tr>`).join('')}</tbody>
-              </table></div></div>` : ''}
-            ${resources.length ? `<div><h4 class="font-semibold text-slate-800 mb-2">Preparation Resources</h4>
-              <ul class="space-y-1.5">${resources.map(r => `<li><a href="${escapeHtml(r.link)}" target="_blank" rel="noopener" class="text-brand-600 hover:underline">${escapeHtml(r.label)}</a></li>`).join('')}</ul></div>` : ''}
-            ${j.caste_relaxation ? `<div class="bg-blue-50 rounded-lg p-3"><p class="text-[10px] text-blue-600 font-medium uppercase">Age Relaxation</p><p class="text-blue-800">${escapeHtml(j.caste_relaxation)}</p></div>` : ''}
-            ${j.apply_link ? `<a href="${escapeHtml(j.apply_link)}" target="_blank" rel="noopener" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-brand-600 text-white font-semibold text-sm hover:bg-brand-700 transition">Apply on Official Website ↗</a>` : ''}
-          </div>
-        </div>`);
-    }
-
-    window.__closeModal = closeModal;
-
-    // ============================================================
-    // 12. ADMIN — AI PARSER (Rule-based demo)
-    // ============================================================
-    function aiParse(raw) {
-      const text = raw.trim();
-      if (!text) return null;
-      const isJob = /recruitment|vacancy|post|exam|job|constable|psc/i.test(text) && !/yojana|scholarship|scheme/i.test(text);
-      const parsed = { _kind: isJob ? 'job' : 'scheme' };
-      // Title: first sentence
-      const first = text.split(/[.\n]/)[0].trim();
-      parsed.title = first.length > 100 ? first.slice(0, 100) + '…' : first || 'Untitled Entry';
-      // Deadline
-      const dateMatch = text.match(/(\d{1,2})[\/-](\d{1,2})[\/-](\d{2,4})/);
-      if (dateMatch) {
-        const [_, d, m, y] = dateMatch;
-        const year = y.length === 2 ? '20' + y : y;
-        parsed.deadline = `${year}-${m.padStart(2,'0')}-${d.padStart(2,'0')}`;
-      }
-      // Apply link
-      const urlMatch = text.match(/https?:\/\/[^\s)]+/);
-      if (urlMatch) parsed.apply_link = urlMatch[0];
-      // Income
-      const incomeMatch = text.match(/income[^.]*?(\d[\d,]*)\s*(lakh|lac|₹|rs)/i);
-      if (incomeMatch) {
-        let val = parseFloat(incomeMatch[1].replace(/,/g,''));
-        if (/lakh|lac/i.test(incomeMatch[2])) val *= 100000;
-        parsed.income_limit = val;
-      }
-      // Age
-      const ageMatch = text.match(/(\d{2})\s*[-–to]+\s*(\d{2})\s*years?/i) || text.match(/age[^.]*?(\d{2})[^.]*?(\d{2})/i);
-      if (ageMatch) { parsed.min_age = Number(ageMatch[1]); parsed.max_age = Number(ageMatch[2]); }
-      // Benefits
-      const benefitMatch = text.match(/(₹[\d,]+(?:\s*(?:\/|per)\s*(?:month|year|annum))?)/i);
-      if (benefitMatch) parsed.benefits = benefitMatch[0];
-      // Description = full text
-      parsed.description = text;
-      parsed.eligibility = text;
-      parsed.eligible_states = /west bengal|wb/i.test(text) ? ['West Bengal'] : ['All'];
-      parsed.eligible_castes = ['All'];
-      parsed.gender = /women|girl|female/i.test(text) ? 'Female' : 'All';
-      if (isJob) {
-        parsed.organization = (text.match(/^([A-Z][A-Za-z\s]+?)(?:\s+Recruitment|\s+Notification)/) || [])[1] || '';
-        parsed.post_name = parsed.title;
-        parsed.state = /west bengal|wb/i.test(text) ? 'West Bengal' : 'All';
-      }
-      return parsed;
-    }
-
-    function renderAiPreview(parsed) {
-      const el = $('#ai-preview');
-      if (!parsed) { el.classList.add('hidden'); return; }
-      el.classList.remove('hidden');
-      el.innerHTML = `
-        <p class="font-semibold text-slate-800 mb-2">🔍 Parsed Preview — review before saving</p>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-          <div><span class="text-slate-400">Type:</span> <strong>${parsed._kind}</strong></div>
-          <div><span class="text-slate-400">Title:</span> <strong>${escapeHtml(parsed.title)}</strong></div>
-          ${parsed.deadline ? `<div><span class="text-slate-400">Deadline:</span> <strong>${parsed.deadline}</strong></div>` : ''}
-          ${parsed.apply_link ? `<div class="sm:col-span-2"><span class="text-slate-400">Link:</span> <a class="text-brand-600 underline" target="_blank" href="${escapeHtml(parsed.apply_link)}">${escapeHtml(parsed.apply_link)}</a></div>` : ''}
-          ${parsed.min_age ? `<div><span class="text-slate-400">Age:</span> <strong>${parsed.min_age}–${parsed.max_age}</strong></div>` : ''}
+    function renderAdminList() {
+      const el = $('#admin-list');
+      if(!el) return;
+      const all = [...state.schemes, ...state.jobs];
+      el.innerHTML = all.map(i => `
+        <div class="bg-white p-3 rounded-xl border border-slate-100 flex justify-between items-center">
+          <span class="text-sm font-semibold">${escapeHtml(i.title)}</span>
+          <button onclick="window.alert('Delete feature requires Supabase DELETE policy.')" class="text-xs text-red-500">Delete</button>
         </div>
-        <div class="flex gap-2 mt-3">
-          <button id="btn-ai-save" class="px-4 py-2 rounded-xl bg-emerald-600 text-white text-xs font-semibold hover:bg-emerald-700">Save to Database</button>
-          <button id="btn-ai-discard" class="px-4 py-2 rounded-xl bg-white border border-slate-200 text-slate-600 text-xs font-semibold hover:bg-slate-50">Discard</button>
-        </div>`;
-      $('#btn-ai-discard').onclick = () => { el.classList.add('hidden'); $('#ai-raw-input').value = ''; };
-      $('#btn-ai-save').onclick = async () => {
-        try {
-          showLoader(true);
-          if (parsed._kind === 'scheme') {
-            const { error } = await supabase.from('schemes').insert({
-              title: parsed.title, type: 'scheme', description: parsed.description,
-              benefits: parsed.benefits || null, eligibility: parsed.eligibility || null,
-              apply_link: parsed.apply_link || null, deadline: parsed.deadline || null,
-              eligible_states: parsed.eligible_states, eligible_castes: parsed.eligible_castes,
-              gender: parsed.gender, min_age: parsed.min_age || null, max_age: parsed.max_age || null,
-              income_limit: parsed.income_limit || null
-            });
-            if (error) throw error;
-          } else {
-            const { error } = await supabase.from('jobs').insert({
-              title: parsed.title, organization: parsed.organization || null,
-              post_name: parsed.post_name || parsed.title, qualification: parsed.qualification || null,
-              age_min: parsed.min_age || null, age_max: parsed.max_age || null,
-              state: parsed.state || 'All', apply_link: parsed.apply_link || null,
-              description: parsed.description, deadline: parsed.deadline || null
-            });
-            if (error) throw error;
-          }
-          toast('Entry saved successfully!', 'success');
-          el.classList.add('hidden');
-          $('#ai-raw-input').value = '';
-          await Promise.all([loadSchemes(), loadJobs()]);
-          renderAll();
-        } catch (err) {
-          console.error('AI save error:', err);
-          toast('Save failed: ' + err.message, 'error');
-        } finally { showLoader(false); }
-      };
+      `).join('');
     }
 
     // ============================================================
-    // 13. AI ASSISTANT (Local rule-based demo)
-    // ============================================================
-    function addAssistantMessage(text, sender = 'bot') {
-      const container = $('#assistant-messages');
-      if (!container) return;
-      const bubble = document.createElement('div');
-      bubble.className = sender === 'user' ? 'flex justify-end' : 'flex justify-start';
-      bubble.innerHTML = `<div class="max-w-[85%] px-3 py-2 rounded-2xl text-sm ${sender === 'user' ? 'bg-brand-600 text-white rounded-br-sm' : 'bg-white/10 text-white/90 rounded-bl-sm'}">${text}</div>`;
-      container.appendChild(bubble);
-      container.scrollTop = container.scrollHeight;
-    }
-
-    function assistantReply(query) {
-      const q = query.toLowerCase();
-      // Navigation intents
-      if (/scholarship|scholar/i.test(q)) { addAssistantMessage('Opening Scholarships for you… 🎓'); setTimeout(() => { location.hash = '#scholarships'; }, 500); return; }
-      if (/scheme|yojana/i.test(q)) { addAssistantMessage('Taking you to Government Schemes… 🏛️'); setTimeout(() => { location.hash = '#schemes'; }, 500); return; }
-      if (/job|vacancy|recruitment/i.test(q)) { addAssistantMessage('Here are the latest Govt Jobs… 💼'); setTimeout(() => { location.hash = '#jobs'; }, 500); return; }
-      if (/profile|eligib/i.test(q) && /how|what|explain/i.test(q)) {
-        addAssistantMessage('Your eligibility depends on <b>state, caste, gender, age, income, and education</b>. Update your profile to get accurate matches. Would you like me to open your profile?');
-        return;
-      }
-      // Search schemes/jobs by keyword
-      const matchedSchemes = state.schemes.filter(s => s.title.toLowerCase().includes(q) || (s.description||'').toLowerCase().includes(q));
-      const matchedJobs = state.jobs.filter(j => j.title.toLowerCase().includes(q));
-      if (matchedSchemes.length) {
-        addAssistantMessage(`I found <b>${matchedSchemes.length}</b> related scheme(s). Top match: <b>${escapeHtml(matchedSchemes[0].title)}</b>. <button class="underline text-brand-300" onclick="location.hash='#schemes'">View all →</button>`);
-        return;
-      }
-      if (matchedJobs.length) {
-        addAssistantMessage(`I found <b>${matchedJobs.length}</b> related job(s). Top match: <b>${escapeHtml(matchedJobs[0].title)}</b>. <button class="underline text-brand-300" onclick="location.hash='#jobs'">View all →</button>`);
-        return;
-      }
-      addAssistantMessage('I can help you find <b>schemes, scholarships, and government jobs</b>. Try asking:<br>• “Show me scholarships for SC students in West Bengal”<br>• “What is the age limit for WBPSC?”<br>• “Take me to government jobs”');
-    }
-
-    // ============================================================
-    // 14. ROUTER & NAVIGATION
+    // 8. ROUTER & EVENTS
     // ============================================================
     const VIEWS = ['home','scholarships','schemes','jobs','preparation','profile','admin'];
     function router() {
       let hash = (location.hash || '#home').replace('#','');
       if (!VIEWS.includes(hash)) hash = 'home';
-      // Admin guard
-      if (hash === 'admin' && state.profile?.role !== 'admin') { toast('Admin access only.', 'warn'); hash = 'home'; }
-      VIEWS.forEach(v => {
-        const el = $(`#view-${v}`);
-        if (el) el.classList.toggle('hidden', v !== hash);
-      });
-      // Active nav styles
+      
+      const isAdmin = state.user && ADMIN_EMAILS.includes(state.user.email);
+      if (hash === 'admin' && !isAdmin) { toast('Admin access only!', 'error'); location.hash = '#home'; return; }
+
+      VIEWS.forEach(v => $(`#view-${v}`)?.classList.toggle('hidden', v !== hash));
       $$('.nav-link').forEach(a => {
-        const target = a.getAttribute('href')?.replace('#','');
-        const active = target === hash;
-        a.classList.toggle('bg-brand-50', active);
+        const active = a.getAttribute('href') === '#' + hash;
         a.classList.toggle('text-brand-700', active);
-        a.classList.toggle('font-semibold', active);
+        a.classList.toggle('bg-brand-50', active);
       });
-      // Re-render view-specific content
-      if (hash === 'home') renderHomeMatched();
-      if (hash === 'scholarships') renderSchemes();
-      if (hash === 'schemes') renderSchemes();
-      if (hash === 'jobs') renderJobs();
-      if (hash === 'preparation') renderPreparation();
-      if (hash === 'profile') renderAuthUI();
-      if (hash === 'admin' && state.profile?.role === 'admin') renderAdminList();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      window.scrollTo(0,0);
     }
 
-    // ============================================================
-    // 15. EVENT BINDINGS
-    // ============================================================
     function bindEvents() {
       // Auth
-      ['#btn-signin-top','#btn-signin-mobile','#btn-signin-profile'].forEach(sel => {
-        const el = $(sel); if (el) el.addEventListener('click', signInWithGoogle);
+      ['#btn-signin-top','#btn-signin-mobile','#btn-signin-profile','#btn-admin-login'].forEach(sel => {
+        $(sel)?.addEventListener('click', signInWithGoogle);
       });
       ['#btn-signout-top','#btn-signout-sidebar'].forEach(sel => {
-        const el = $(sel); if (el) el.addEventListener('click', signOut);
+        $(sel)?.addEventListener('click', signOut);
       });
-      // Profile form
-      $('#profile-form')?.addEventListener('submit', async (e) => {
+      
+      // Form
+      $('#profile-form')?.addEventListener('submit', (e) => {
         e.preventDefault();
-        await saveProfile(new FormData(e.target));
+        saveProfile(new FormData(e.target));
       });
-      // Avatar
-      $('#avatar-input')?.addEventListener('change', (e) => {
-        const file = e.target.files?.[0];
-        if (file) uploadAvatar(file);
-      });
-      // Global delegated clicks
+
+      // Global Nav
       document.addEventListener('click', (e) => {
-        const navBtn = e.target.closest('[data-nav]');
-        if (navBtn) { location.hash = navBtn.getAttribute('data-nav'); return; }
-        const schemeBtn = e.target.closest('.btn-scheme-detail');
-        if (schemeBtn) { showSchemeDetail(schemeBtn.dataset.schemeId); return; }
-        const jobBtn = e.target.closest('.btn-job-detail');
-        if (jobBtn) { showJobDetail(jobBtn.dataset.jobId); return; }
-        if (e.target.id === 'modal-overlay') closeModal();
+        const nav = e.target.closest('[data-nav]');
+        if(nav) location.hash = nav.dataset.nav;
+        if(e.target.id === 'modal-overlay') $('#modal-overlay').classList.add('hidden');
       });
-      // Admin
+
+      // AI Parse (Demo)
       $('#btn-ai-parse')?.addEventListener('click', () => {
-        const raw = $('#ai-raw-input').value;
-        if (!raw.trim()) { toast('Paste some text first.', 'warn'); return; }
-        renderAiPreview(aiParse(raw));
+        const text = $('#ai-raw-input').value;
+        if(!text) return toast('Enter text first', 'warn');
+        const prev = $('#ai-preview');
+        prev.classList.remove('hidden');
+        prev.innerHTML = `<b>Preview:</b> Title: ${text.split('.')[0]} <br><button class="mt-2 bg-emerald-600 text-white px-2 py-1 rounded">Save to DB</button>`;
       });
-      $('#btn-ai-clear')?.addEventListener('click', () => { $('#ai-raw-input').value = ''; $('#ai-preview').classList.add('hidden'); });
-      $('#btn-admin-refresh')?.addEventListener('click', async () => { await Promise.all([loadSchemes(), loadJobs()]); renderAll(); toast('Data refreshed.', 'success'); });
-      // Assistant
-      $('#assistant-btn')?.addEventListener('click', () => {
-        state.assistantOpen = !state.assistantOpen;
-        $('#assistant-panel').classList.toggle('hidden', !state.assistantOpen);
-        if (state.assistantOpen && $('#assistant-messages').children.length === 0) {
-          addAssistantMessage('Namaste! 🙏 I\'m Navigator AI. Ask me about schemes, scholarships, government jobs, or eligibility. Type <b>help</b> to see what I can do.');
-        }
-      });
-      $('#assistant-close')?.addEventListener('click', () => { state.assistantOpen = false; $('#assistant-panel').classList.add('hidden'); });
-      $('#assistant-form')?.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const input = $('#assistant-input');
-        const val = input.value.trim();
-        if (!val) return;
-        addAssistantMessage(escapeHtml(val), 'user');
-        input.value = '';
-        setTimeout(() => assistantReply(val), 400);
-      });
-      // Draggable assistant button
-      (function makeDraggable() {
-        const btn = $('#assistant-btn');
-        if (!btn) return;
-        let dragging = false, startX, startY, startLeft, startTop;
-        btn.addEventListener('pointerdown', (e) => {
-          dragging = true; startX = e.clientX; startY = e.clientY;
-          const rect = btn.parentElement.getBoundingClientRect();
-          startLeft = rect.left; startTop = rect.top;
-          btn.setPointerCapture(e.pointerId);
-        });
-        btn.addEventListener('pointermove', (e) => {
-          if (!dragging) return;
-          const dx = e.clientX - startX, dy = e.clientY - startY;
-          const parent = btn.parentElement;
-          parent.style.left = Math.max(8, Math.min(window.innerWidth - 70, startLeft + dx)) + 'px';
-          parent.style.top = Math.max(8, Math.min(window.innerHeight - 70, startTop + dy)) + 'px';
-          parent.style.right = 'auto'; parent.style.bottom = 'auto';
-        });
-        btn.addEventListener('pointerup', () => { dragging = false; });
-      })();
+
+      window.addEventListener('hashchange', router);
     }
 
     // ============================================================
-    // 16. BOOTSTRAP
+    // 9. INITIALIZATION
     // ============================================================
     async function init() {
+      showLoader(true);
       try {
-        showLoader(true);
-        // Auth session
-        const session = await getSession();
+        const { data: { session } } = await supabase.auth.getSession();
         state.user = session?.user || null;
+        
         if (state.user) await loadProfile();
-        // Load data
-        await Promise.all([loadSchemes(), loadJobs()]);
-        // Bind & render
+        await loadData();
+        
         bindEvents();
         renderAll();
         router();
-        // Auth state listener
+
         supabase.auth.onAuthStateChange(async (event, session) => {
           state.user = session?.user || null;
-          if (state.user) await loadProfile(); else state.profile = null;
+          if (state.user) await loadProfile();
+          else state.profile = null;
           renderAll();
           router();
         });
-        // Hash router
-        window.addEventListener('hashchange', router);
       } catch (err) {
-        console.error('Init error:', err);
-        toast('Initialisation failed. Check your Supabase configuration.', 'error');
-      } finally { showLoader(false); }
+        console.error('Init Error:', err);
+        toast('App Initialization Failed. Check API Key.', 'error');
+      } finally {
+        showLoader(false);
+      }
     }
 
     init();
