@@ -82,7 +82,6 @@
           </div>
           <div class="hidden lg:block text-sm font-medium text-slate-500">Welcome back 👋</div>
           <div class="flex items-center gap-2">
-            <!-- Admin Login Button -->
             <button id="btn-admin-login" class="hidden sm:inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-800 border border-slate-700 hover:bg-slate-900 text-sm font-semibold text-white transition shadow-sm">
               🔐 Admin Login
             </button>
@@ -211,15 +210,15 @@
   <!-- ================= APP LOGIC ================= -->
   <script type="module">
     // ============================================================
-    // 1. CONFIGURATION (এখানে আপনার Supabase Key এবং Admin Email দিন)
+    // 1. CONFIGURATION 
     // ============================================================
     const SUPABASE_URL = 'https://kzbhpwtcsowzivgpellr.supabase.co';
     
-    // ⚠️ এখানে আপনার Supabase "anon" key পেস্ট করুন (Project Settings > API)
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...YOUR_ACTUAL_KEY_HERE'; 
+    // ✅ আপনার দেওয়া Supabase Publishable Key এখানে যুক্ত করা হয়েছে
+    const SUPABASE_ANON_KEY = 'sb_publishable_RUO7ScIOI8q5r8_iH5udVA_WmbrdwLf'; 
 
-    // ⚠️ এখানে আপনার জিমেইল দিন, যেটা দিয়ে অ্যাডমিন প্যানেলে ঢুকতে চান
-    const ADMIN_EMAILS = ['your-email@gmail.com', 'admin@example.com'];
+    // ⚠️ Admin Login এর জন্য এখানে আপনার জিমেইলটি বসান
+    const ADMIN_EMAILS = ['sb197207@gmail.com']; 
 
     import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
@@ -246,7 +245,6 @@
     }
 
     const escapeHtml = (str) => { if(!str) return ''; const div = document.createElement('div'); div.textContent = str; return div.innerHTML; };
-    const formatDate = (d) => d ? new Date(d).toLocaleDateString('en-IN') : '—';
 
     // ============================================================
     // 3. AUTH & PROFILE
@@ -261,7 +259,7 @@
         if (error) throw error;
       } catch (err) {
         console.error(err);
-        toast('Login failed. Check Supabase OAuth settings.', 'error');
+        toast('Login failed. Check Supabase Google OAuth settings.', 'error');
       } finally { showLoader(false); }
     }
 
@@ -277,7 +275,6 @@
       const { data, error } = await supabase.from('profiles').select('*').eq('id', state.user.id).maybeSingle();
       if (error) {
         console.error('Profile load error:', error);
-        toast('Could not load profile. Did you run the SQL setup?', 'error');
         return;
       }
       state.profile = data;
@@ -304,7 +301,7 @@
         return;
       }
       await loadProfile();
-      toast('Profile saved!', 'success');
+      toast('Profile saved successfully!', 'success');
       renderAll();
     }
 
@@ -314,13 +311,21 @@
     async function loadData() {
       // Schemes
       const { data: sch, error: e1 } = await supabase.from('schemes').select('*');
-      if (e1) { console.error('Schemes fetch error:', e1); toast('Could not load schemes. (Check Table & RLS)', 'error'); }
-      else state.schemes = sch || [];
+      if (e1) { 
+        console.error('Schemes fetch error:', e1); 
+        toast('Could not load schemes. Did you create the "schemes" table?', 'error'); 
+      } else {
+        state.schemes = sch || [];
+      }
 
       // Jobs
       const { data: jb, error: e2 } = await supabase.from('jobs').select('*');
-      if (e2) { console.error('Jobs fetch error:', e2); toast('Could not load jobs. (Check Table & RLS)', 'error'); }
-      else state.jobs = jb || [];
+      if (e2) { 
+        console.error('Jobs fetch error:', e2); 
+        toast('Could not load jobs. Did you create the "jobs" table?', 'error'); 
+      } else {
+        state.jobs = jb || [];
+      }
     }
 
     // ============================================================
@@ -347,13 +352,12 @@
       $('#profile-guest').classList.toggle('hidden', signedIn);
       $('#profile-form').classList.toggle('hidden', !signedIn);
 
-      // Admin UI Toggle
       const adminBtn = $('#nav-admin');
       if (adminBtn) {
         adminBtn.classList.toggle('hidden', !isAdmin);
         adminBtn.classList.toggle('flex', isAdmin);
       }
-      $('#btn-admin-login').classList.toggle('hidden', isAdmin || signedIn); // Hide if already admin
+      $('#btn-admin-login').classList.toggle('hidden', isAdmin || signedIn);
 
       if (signedIn) {
         $('#sidebar-name').textContent = state.profile?.full_name || state.user.email;
@@ -377,7 +381,7 @@
           <h3 class="font-bold text-slate-900 line-clamp-2">${escapeHtml(j.title)}</h3>
           <p class="text-xs text-slate-500 mt-1">${escapeHtml(j.organization || '')}</p>
           <div class="mt-4">
-            <button onclick="window.alert('Job details modal can be added here.')" class="px-3 py-1.5 bg-indigo-600 text-white text-xs rounded-lg">View Details</button>
+            <button onclick="window.alert('Details page under construction.')" class="px-3 py-1.5 bg-indigo-600 text-white text-xs rounded-lg">View Details</button>
           </div>
         </article>`;
     }
@@ -389,12 +393,12 @@
       const scList = state.schemes.filter(s => s.type === 'scheme' && matchesProfile(s, state.profile));
       const jbList = state.jobs.filter(j => matchesProfile(j, state.profile));
 
-      if ($('#scholarship-list')) $('#scholarship-list').innerHTML = schList.map(schemeCard).join('') || '<p class="text-sm text-slate-400">No scholarships found.</p>';
-      if ($('#scheme-list')) $('#scheme-list').innerHTML = scList.map(schemeCard).join('') || '<p class="text-sm text-slate-400">No schemes found.</p>';
-      if ($('#job-list')) $('#job-list').innerHTML = jbList.map(jobCard).join('') || '<p class="text-sm text-slate-400">No jobs found.</p>';
+      if ($('#scholarship-list')) $('#scholarship-list').innerHTML = schList.map(schemeCard).join('') || '<p class="text-sm text-slate-400">No scholarships found. Add data via Admin Panel.</p>';
+      if ($('#scheme-list')) $('#scheme-list').innerHTML = scList.map(schemeCard).join('') || '<p class="text-sm text-slate-400">No schemes found. Add data via Admin Panel.</p>';
+      if ($('#job-list')) $('#job-list').innerHTML = jbList.map(jobCard).join('') || '<p class="text-sm text-slate-400">No jobs found. Add data via Admin Panel.</p>';
       
       const homeList = [...schList.slice(0,2).map(schemeCard), ...jbList.slice(0,2).map(jobCard)].join('');
-      if ($('#home-matched')) $('#home-matched').innerHTML = homeList || '<p class="text-sm text-slate-400">Complete your profile to see matches.</p>';
+      if ($('#home-matched')) $('#home-matched').innerHTML = homeList || '<p class="text-sm text-slate-400">Complete your profile and add data to see matches.</p>';
 
       if (state.user && ADMIN_EMAILS.includes(state.user.email)) renderAdminList();
     }
@@ -406,6 +410,10 @@
       const el = $('#admin-list');
       if(!el) return;
       const all = [...state.schemes, ...state.jobs];
+      if(all.length === 0) {
+        el.innerHTML = '<p class="text-sm text-slate-400 text-center py-4">No entries found in Database.</p>';
+        return;
+      }
       el.innerHTML = all.map(i => `
         <div class="bg-white p-3 rounded-xl border border-slate-100 flex justify-between items-center">
           <span class="text-sm font-semibold">${escapeHtml(i.title)}</span>
@@ -435,7 +443,6 @@
     }
 
     function bindEvents() {
-      // Auth
       ['#btn-signin-top','#btn-signin-mobile','#btn-signin-profile','#btn-admin-login'].forEach(sel => {
         $(sel)?.addEventListener('click', signInWithGoogle);
       });
@@ -443,20 +450,17 @@
         $(sel)?.addEventListener('click', signOut);
       });
       
-      // Form
       $('#profile-form')?.addEventListener('submit', (e) => {
         e.preventDefault();
         saveProfile(new FormData(e.target));
       });
 
-      // Global Nav
       document.addEventListener('click', (e) => {
         const nav = e.target.closest('[data-nav]');
         if(nav) location.hash = nav.dataset.nav;
         if(e.target.id === 'modal-overlay') $('#modal-overlay').classList.add('hidden');
       });
 
-      // AI Parse (Demo)
       $('#btn-ai-parse')?.addEventListener('click', () => {
         const text = $('#ai-raw-input').value;
         if(!text) return toast('Enter text first', 'warn');
@@ -493,7 +497,7 @@
         });
       } catch (err) {
         console.error('Init Error:', err);
-        toast('App Initialization Failed. Check API Key.', 'error');
+        toast('App Initialization Failed.', 'error');
       } finally {
         showLoader(false);
       }
